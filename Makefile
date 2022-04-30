@@ -4,26 +4,28 @@ n=\e[0m
 g=\e[1;32m
 r=\e[1;31m
 
-ASM = $(wildcard test/*.s)
+TEST_DIRS = $(wildcard test/**/)
+ASM = $(wildcard test/**/*.s)
 MEM = $(ASM:%.s=%.mem)
 
 # binutils-riscv64-linux-gnu is needed for assembleing.
-test/%.elf: test/%.s
+%.elf: %.s
 	riscv64-linux-gnu-as -march=rv32i $< -o $@
 
-test/%.bin: test/%.elf
+%.bin: %.elf
 	dd skip=52 bs=1 if=$< of=$@ count=$$(expr $$(stat --printf="%s" $<) - 444)
 
-test/%.mem: test/%.bin
+%.mem: %.bin
 	xxd -p -c1 $< $@
 
 assemble: $(MEM)
 
-INPUT ?= test/addi
+INPUT ?= test/i-type/addi
 
 obj_dir/Vriscv_machine: src/*.sv 323src/*.sv 323src/sim_main.cpp
 	docker run -ti -v ${PWD}:/work												\
 			verilator/verilator:latest --exe --build --cc --top riscv_machine	\
+					-Wno-BLKLOOPINIT											\
 					`find src 323src -iname '*.v' -o -iname '*.sv'`				\
 					323src/sim_main.cpp
 
@@ -46,6 +48,9 @@ verify-all: compile assemble
 	else 																					\
 		echo "$gAll tests passed! ($$(find test -iname '*.mem' | wc -l) tests)$n";			\
 	fi
+
+.PHONY: clean
+.PHONY: clean-mem
 
 clean:
 	rm -rf obj_dir

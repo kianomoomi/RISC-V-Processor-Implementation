@@ -9,20 +9,25 @@ module memory(
     clk,
     rst_b
 );
-    output reg[7:0] data_out[0:3];
+    output [7:0] data_out[0:3];
     input [31:0] addr;
-    input [7:0] data_in[0:3];
+    input  [7:0] data_in[0:3];
     input we;
     input clk;
     input rst_b;
 
-    parameter start = 0, top = (1<<24) - 1;
+    parameter start = 0, top = (1<<16) - 1;
     parameter last_index = top >> 2;
     parameter has_default=0;
     parameter default_file="";
 
     reg [7:0] mem[start:top];
     wire [31:0] ea = addr & 32'hfffffffc;
+
+    assign data_out[0] = mem[ea];
+    assign data_out[1] = mem[ea + 1];
+    assign data_out[2] = mem[ea + 2];
+    assign data_out[3] = mem[ea + 3];
 
     always_ff @(posedge clk, negedge rst_b) begin
         if (rst_b == 0) begin
@@ -32,14 +37,10 @@ module memory(
                 // for (i = start; i <= top; i++)
                 //     $display(i, mem[i]);
             end else begin
-                for (i = start; i <= last_index; i++)
+                for (i = start; i <= top; i++)
                     mem[i] <= 0;
             end
         end else begin
-            data_out[0] <= mem[ea];
-            data_out[1] <= mem[ea + 1];
-            data_out[2] <= mem[ea + 2];
-            data_out[3] <= mem[ea + 3];
             if (we) begin
                 mem[ea + 0] <= data_in[0];
                 mem[ea + 1] <= data_in[1];
