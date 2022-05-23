@@ -23,7 +23,7 @@ assemble: $(MEM)
 INPUT ?= test/i-type/addi
 
 obj_dir/Vriscv_machine: src/*.sv 323src/*.sv 323src/sim_main.cpp
-	docker run -ti -v ${PWD}:/work												\
+	docker run -ti -v "${PWD}:/work"												\
 			verilator/verilator:latest --exe --build --cc --top riscv_machine	\
 					-Wno-BLKLOOPINIT											\
 					`find src 323src -iname '*.v' -o -iname '*.sv'`				\
@@ -31,14 +31,14 @@ obj_dir/Vriscv_machine: src/*.sv 323src/*.sv 323src/sim_main.cpp
 
 compile: obj_dir/Vriscv_machine
 
-sim: compile assemble
+sim: compile #assemble
 	cp ${INPUT}.mem output/instructions.mem
 	./obj_dir/Vriscv_machine
 
 verify: sim
 	diff -u ${INPUT}.reg output/regdump.reg 1>&2
 
-verify-all: compile assemble
+verify-all: compile #assemble
 	@fail=0;																				\
 	for test in `find test -iname '*.mem'`; do												\
 		if ! make verify INPUT=$${test%".mem"}; then fail=$$(expr $$fail + 1); fi;			\
