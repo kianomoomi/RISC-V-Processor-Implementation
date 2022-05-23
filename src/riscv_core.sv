@@ -22,19 +22,22 @@ module riscv_core(
 
     reg [6:0] opcode;
     reg [2:0] func3;
-    reg [4:0] rs1;
-    reg [4:0] rs2;
-    reg [4:0] rd;
-    reg [11:0] immSmall;
+    reg [4:0] rs1_num;
+    reg [31:0] rs1_data;
+    reg [4:0] rs2_num;
+    reg [31:0] rs2_data;
+    reg [4:0] rd_num;
+    reg [31:0] rd_data;
+    reg [31:0] immSmall;
 
     regfile r(
-    .rs1_data(),
-    .rs2_data(),
-    .rs1_num(),
-    .rs2_num(),
-    .rd_num(),
-    .rd_data(),
-    .rd_we(1'b0),
+    .rs1_data(rs1_data),
+    .rs2_data(rs2_data),
+    .rs1_num(rs1_num),
+    .rs2_num(rs2_num),
+    .rd_num(rd_num),
+    .rd_data(rd_data),
+    .rd_we(1'b1),
     .clk(clk),
     .rst_b(rst_b),
     .halted(halted)
@@ -53,11 +56,12 @@ module riscv_core(
             end
             else if (opcode == 'h13) begin
                 func3 = inst[14:12];
-                immSmall = inst[31:20];
-                rs1 = inst[19:15];
-                rd = inst[11:7]
+                immSmall[11:0] = inst[31:20];
+                rs1_num = inst[19:15];
+                rd_num = inst[11:7];
                 if (func3 == 0) begin
-                    
+                    rd_data = rs1_data + immSmall;
+                    halted <= 1;
                 end
             end
 
