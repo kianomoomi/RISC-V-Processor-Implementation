@@ -20,8 +20,13 @@ module riscv_core(
     input          clk;
     input          rst_b;
 
+    reg [31:0] instAddr;
+    reg [31:0] result;
+    reg halt;
+
     reg [6:0] opcode;
     reg [2:0] func3;
+    reg [6:0] func7;
     reg [4:0] rs1_num;
     reg [31:0] rs1_data;
     reg [4:0] rs2_num;
@@ -45,29 +50,56 @@ module riscv_core(
 
     always_ff @(posedge clk, negedge rst_b) begin
         if (rst_b == 0) begin
-            halted <= 0;
+            halt <= 0;
         end
         else begin
             opcode = inst[6:0];
-            $display("%h", opcode);
-            $display("%h", inst);
+            // $display("%h", opcode);
+            // $display("%h", inst);
+            
+            // ecall
             if (opcode == 'h73) begin
-                halted <= 1;
+                halt <= 1;
             end
+
+            // i-type
             else if (opcode == 'h13) begin
                 func3 = inst[14:12];
                 immSmall[11:0] = inst[31:20];
+                $display("%d", immSmall);
                 rs1_num = inst[19:15];
                 rd_num = inst[11:7];
                 if (func3 == 0) begin
-                    rd_data = rs1_data + immSmall;
-                    halted <= 1;
+                    if (immSmall >= 2048) begin
+                        immSmall = 4096 - immSmall;
+                        result = rs1_data - immSmall;
+                    end
+                    else begin
+                        result = rs1_data + immSmall;
+                    end
+                    rd_data <= result;
+                    instAddr <= instAddr + 4;
                 end
             end
+
+            //  r-type
+            else if (opcode == 'h33) begin
+                func3 = inst[14:12];
+                func7 = inst[31:25];
+                rs1_num = inst[19:15];
+                rs2_num = inst[24:20];
+                rd_num = inst[11:7];
+                if (func3 == 0 && func7 == 0) begin
+                    result = rs1_data + rs2_data;
+                    rd_data <= result;
+                    instAddr <= instAddr + 4;
+                end 
+            end 
 
         end
 
     end
 
-
+    assign inst_addr = instAddr;
+    assign halted = (halt == 1);
 endmodule
