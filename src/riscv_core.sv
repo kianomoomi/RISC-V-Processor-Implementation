@@ -20,6 +20,13 @@ module riscv_core(
     input          clk;
     input          rst_b;
 
+    reg [6:0] opcode;
+    reg [2:0] func3;
+    reg [4:0] rs1;
+    reg [4:0] rs2;
+    reg [4:0] rd;
+    reg [11:0] immSmall;
+
     regfile r(
     .rs1_data(),
     .rs2_data(),
@@ -37,7 +44,24 @@ module riscv_core(
         if (rst_b == 0) begin
             halted <= 0;
         end
-        else halted <=1;
+        else begin
+            opcode = inst[6:0];
+            $display("%h", opcode);
+            $display("%h", inst);
+            if (opcode == 'h73) begin
+                halted <= 1;
+            end
+            else if (opcode == 'h13) begin
+                func3 = inst[14:12];
+                immSmall = inst[31:20];
+                rs1 = inst[19:15];
+                rd = inst[11:7]
+                if (func3 == 0) begin
+                    
+                end
+            end
+
+        end
 
     end
 
