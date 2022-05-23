@@ -20,4 +20,24 @@ module riscv_core(
     input          clk;
     input          rst_b;
 
+    regfile regFile(
+        .rs1_data(),
+        .rs2_data(),
+        .rs1_num(),
+        .rs2_num(),
+        .rd_num(),
+        .rd_data(),
+        .rd_we(1'b0),
+        .clk(clk),
+        .rst_b(rst_b),
+        .halted(halted)
+    );
+
+    always_ff @(posedge clk, negedge rst_b) begin
+        if (rst_b == 0)
+            halted <= 0;
+        else 
+            halted <= 1;
+    end
+
 endmodule
