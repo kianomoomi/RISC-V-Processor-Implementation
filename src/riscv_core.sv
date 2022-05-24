@@ -20,10 +20,6 @@ module riscv_core(
     input          clk;
     input          rst_b;
 
-    reg [31:0] instAddr;
-    reg [31:0] result;
-    reg halt;
-
     reg [6:0] opcode;
     reg [2:0] func3;
     reg [6:0] func7;
