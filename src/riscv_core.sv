@@ -24,6 +24,8 @@ module riscv_core(
     input          rst_b;
 
 
+    reg [31:0] input1;
+    reg [31:0] input2;
     reg [31:0] instAddr;
     reg [3:0] alu_control;
     reg [6:0] opcode;
@@ -41,11 +43,11 @@ module riscv_core(
     regfile r(
     .rs1_data(rs1_data),
     .rs2_data(rs2_data),
-    // .rs1_num(inst[19:15]),
-    // .rs2_num(inst[24:20]),
+    .rs1_num(inst[19:15]),
+    .rs2_num(inst[24:20]),
     // .rd_num(inst[11:7]),
-    .rs1_num(rs1_num),
-    .rs2_num(rs2_num),
+    // .rs1_num(rs1_num),
+    // .rs2_num(rs2_num),
     .rd_num(rd_num),
     .rd_data(rd_data),
     .rd_we(1'b1),
@@ -63,22 +65,29 @@ module riscv_core(
         halted
     );
     ALU alu_module(
-        rs1_data,
-        rs2_data,
+        input1,
+        input2,
         alu_control,
         rd_data,
         halted
     );
 
     always @(posedge clk, negedge rst_b) begin
-        rs1_num <= inst[19:15];
-        rs2_num <= inst[24:20];
+        // rs1_num <= inst[19:15];
+        // rs2_num <= inst[24:20];
         rd_num <= inst[11:7];
+        input1 = rs1_data;
         $display("%b", inst);
-        $display("--", rs1_num);
+        // $display("--", rs1_num);
         opcode <= inst[6:0];
         if (opcode == 7'h73) begin
             halted <= 1;
+        end
+        else if (opcode == 7'h13) begin
+            input2 <= {{20{inst[31]}}, inst[31:20]};
+        end
+        else if (opcode == 7'h33) begin
+            input2 <= rs2_data;
         end
         if (rst_b == 0) begin
             instAddr <= 0;

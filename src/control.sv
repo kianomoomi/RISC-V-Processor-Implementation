@@ -8,7 +8,6 @@ module control(
 );
         always_ff @*
         begin
-            $display("%h", opcode);
         if (opcode == 7'h33) begin // R-type instructions
 
             regwrite_control = 1;
