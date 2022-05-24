@@ -3,11 +3,12 @@ module control(
     input [2:0] funct3,
     input [6:0] opcode,
     output reg [3:0] alu_control,
-    output reg regwrite_control
+    output reg regwrite_control,
+    output halted
 );
-
-    always @(funct3 or funct7 or opcode)
-    begin
+        always_ff @*
+        begin
+            $display("%h", opcode);
         if (opcode == 7'h33) begin // R-type instructions
 
             regwrite_control = 1;
@@ -45,7 +46,6 @@ module control(
       else if (opcode == 7'h67) begin // I type third
           
       end
-
-    end
+        end
 
 endmodule

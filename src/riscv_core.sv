@@ -1,4 +1,5 @@
-`include "ALU.sv"
+// `include "src/ALU.sv"
+
 
 
 module riscv_core(
@@ -22,6 +23,9 @@ module riscv_core(
     input          clk;
     input          rst_b;
 
+
+    reg [31:0] instAddr;
+    reg [3:0] alu_control;
     reg [6:0] opcode;
     reg [2:0] func3;
     reg [6:0] func7;
@@ -37,18 +41,53 @@ module riscv_core(
     regfile r(
     .rs1_data(rs1_data),
     .rs2_data(rs2_data),
-    .rs1_num(inst[19:15]),
-    .rs2_num(inst[24:20]),
-    .rd_num(inst[11:7]),
-    // .rs1_num(rs1_num),
-    // .rs2_num(rs2_num),
-    // .rd_num(rd_num),
+    // .rs1_num(inst[19:15]),
+    // .rs2_num(inst[24:20]),
+    // .rd_num(inst[11:7]),
+    .rs1_num(rs1_num),
+    .rs2_num(rs2_num),
+    .rd_num(rd_num),
     .rd_data(rd_data),
     .rd_we(1'b1),
     .clk(clk),
     .rst_b(rst_b),
     .halted(halted)
     );
+
+    control control_module(
+        inst[31:25],
+        inst[14:12],
+        inst[6:0],
+        alu_control,
+        rd_we,
+        halted
+    );
+    ALU alu_module(
+        rs1_data,
+        rs2_data,
+        alu_control,
+        rd_data,
+        halted
+    );
+
+    always @(posedge clk, negedge rst_b) begin
+        rs1_num <= inst[19:15];
+        rs2_num <= inst[24:20];
+        rd_num <= inst[11:7];
+        $display("%b", inst);
+        $display("--", rs1_num);
+        opcode <= inst[6:0];
+        if (opcode == 7'h73) begin
+            halted <= 1;
+        end
+        if (rst_b == 0) begin
+            instAddr <= 0;
+        end
+        else
+        instAddr <= instAddr + 4;
+    end
+
+    assign inst_addr = instAddr;
 
 
 
@@ -111,6 +150,5 @@ module riscv_core(
 
     // // assign rd_data = (opcode == 'h13 && func3 == 0) ? ((immSmall >= 2048) ? (rs1_data - (4096 - immSmall)) : rs1_data + immSmall) : 0;
 
-    // assign inst_addr = instAddr;
     // assign halted = (halt == 1);
 endmodule

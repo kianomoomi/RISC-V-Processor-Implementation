@@ -13,39 +13,41 @@ ALU Control lines | Function
 */
 
 module ALU (
-    input [31:0] inp1,inp2, 
+    input [31:0] rs1_data, rs2_data, 
     input [3:0] alu_control,
     output reg [31:0] alu_result,
-    output reg zero_flag
+    output reg halted
 );
 
 always @(*)
     begin
         // Operating based on control input
+        $display(alu_control);
         case(alu_control)
 
-            4'b0000: alu_result = in1&in2;
-            4'b0001: alu_result = in1|in2;
-            4'b0010: alu_result = in1+in2;
-            4'b0100: alu_result = in1-in2;
+            4'b0000: alu_result = rs1_data&rs2_data;
+            4'b0001: alu_result = rs1_data|rs2_data;
+            4'b0010: alu_result = rs1_data+rs2_data;
+            4'b0100: alu_result = rs1_data-rs2_data;
             4'b1000: begin 
-                if(in1<in2)
+                if(rs1_data<rs2_data)
                 alu_result = 1;
                 else
                 alu_result = 0;
             end
-            4'b0011: alu_result = in1<<in2;
-            4'b0101: alu_result = in1>>in2;
-            4'b0110: alu_result = in1*in2;
-            4'b0111: alu_result = in1^in2;
+            4'b0011: alu_result = rs1_data<<rs2_data;
+            4'b0101: alu_result = rs1_data>>rs2_data;
+            4'b0110: alu_result = rs1_data*rs2_data;
+            4'b0111: alu_result = rs1_data^rs2_data;
+            default: alu_result = rs1_data;
 
         endcase
 
         // Setting Zero_flag if ALU_result is zero
-        if (alu_result == 0)
-            zero_flag = 1'b1;
-        else
-            zero_flag = 1'b0;
+        // if (alu_result == 0)
+        //     halted = 1'b0;
+        // else
+        //     halted = 1'b1;
         
     end
 
