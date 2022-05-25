@@ -34,9 +34,9 @@ module riscv_core(
     reg [2:0] func3;
     reg [6:0] func7;
     reg [4:0] rs1_num;
-    wire [31:0] rs1_data;
+    reg [31:0] rs1_data;
     reg [4:0] rs2_num;
-    wire [31:0] rs2_data;
+    reg [31:0] rs2_data;
     reg [4:0] rd_num;
     reg [31:0] rd_data;
     reg [31:0] immSmall;
@@ -62,11 +62,13 @@ module riscv_core(
 
     control control_module(
         inst,
+        inst_addr,
         rs1_num,
         rs2_num,
         rd_num,
         immSmall,
-        alu_control
+        alu_control,
+        clk
     );
     
     ALU alu_module(
@@ -78,24 +80,28 @@ module riscv_core(
 
 
     always_ff @ (posedge clk) begin
-        $display(halted);
-        opcode <= inst[6:0];
+        // $display(halted);
+        opcode = inst[6:0];
         if (opcode == 'h73) begin
             halted <= 1;
         end
+        $display("in core: ", inst_addr);
+        if (bool != 1'b0)
         inst_addr <= inst_addr + 4;
+        bool = !bool;
     end
 
     always_comb begin
-
+    // always @(posedge clk) begin
+        $display("in combinational: ", inst);
         case(opcode)
         'h33: begin
-            input1 = rs1_data;
             input2 = rs2_data;
+            input1 = rs1_data;
         end
         'h13: begin
-            input1 = rs1_data;
             input2 = immSmall;
+            input1 = rs1_data;
         end
         default: begin
             input1 = 0;

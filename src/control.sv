@@ -1,18 +1,24 @@
 module control(
     input[31:0] inst,
+    input [31:0] inst_addr,
     output reg [4:0] rs1_num,
     output reg [4:0] rs2_num,
     output reg [4:0] rd_num,
     output reg [31:0] immSmall,
-    output reg [3:0] alu_control
+    output reg [3:0] alu_control,
+    input clk
 );
     reg[6:0] opcode;
     reg[2:0] funct3;
     reg[6:0] funct7;
+    reg bool = 1'b0;
 
-
-    always @(inst) begin
+    always @(inst_addr) begin
+    // always_comb begin
         // $display("%h", inst);
+        // if(bool == 1'b0)
+        // begin
+            $display("in control: ", inst);
         opcode = inst[6:0];
         case(opcode)
         'h33: begin
@@ -48,6 +54,9 @@ module control(
 
         end
     endcase
+        // end
+        // bool = !bool;
+        
     end
 
 

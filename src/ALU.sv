@@ -6,6 +6,8 @@ module ALU (
 );
 
 always_comb begin
+    $display("in ALU: ", inp1, " + ", inp2);
+
     case(alu_control)
     4'b0010: alu_result = inp1 + inp2;
     4'b0100: alu_result = inp1 - inp2;
