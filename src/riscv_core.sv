@@ -13,7 +13,7 @@ module riscv_core(
     clk,
     rst_b
 );
-    output  [31:0] inst_addr;
+    output  reg [31:0] inst_addr;
     input   [31:0] inst;
     output  [31:0] mem_addr;
     input   [7:0]  mem_data_out[0:3];
@@ -29,7 +29,7 @@ module riscv_core(
     reg [31:0] input1;
     reg [31:0] input2;
     reg [31:0] instAddr;
-    reg halt;
+    // reg halt;
     reg bool = 1'b0;
     
     reg [3:0] alu_control;
@@ -61,6 +61,23 @@ module riscv_core(
         .clk(clk),
         .rst_b(rst_b),
         .halted(halted)
+    );
+
+    control control_module(
+        inst,
+        rs1_num,
+        rs2_num,
+        rd_num,
+        immSmall,
+        alu_control
+    );
+    
+    ALU alu_module(
+        input1,
+        input2,
+        alu_control,
+        rd_data
+        // halted
     );
 
     // control control_module(
@@ -109,52 +126,92 @@ module riscv_core(
 
 
 
-    always_ff @(posedge clk, negedge rst_b) begin
-        if (bool == 1'b0) begin  
-            if (rst_b == 0) begin
-                halt <= 0;
-            end
-            else begin
-                opcode <= inst[6:0];
+    // always_ff @(posedge clk, negedge rst_b) begin
+    //     if (bool == 1'b0) begin  
+    //         if (rst_b == 0) begin
+    //             halt <= 0;
+    //         end
+    //         else begin
+    //             opcode <= inst[6:0];
                 
-                // ecall
-                if (opcode == 'h73) begin
-                    halt <= 1;
-                end
+    //             // ecall
+    //             if (opcode == 'h73) begin
+    //                 halt <= 1;
+    //             end
 
-                // i-type
-                else if (opcode == 'h13) begin
-                    func3 <= inst[14:12];
-                    immSmall[11:0] <= inst[31:20];
-                    rs1_num <= inst[19:15];
-                    rd_num <= inst[11:7];
+    //             // i-type
+    //             else if (opcode == 'h13) begin
+    //                 func3 <= inst[14:12];
+    //                 immSmall[11:0] <= inst[31:20];
+    //                 rs1_num <= inst[19:15];
+    //                 rd_num <= inst[11:7];
 
-                    instAddr <= instAddr + 4;
-                end
+    //                 instAddr <= instAddr + 4;
+    //             end
 
-                // r-type
-                else if (opcode == 'h33) begin
-                    func3 <= inst[14:12];
-                    func7 <= inst[31:25];
-                    rs1_num <= inst[19:15];
-                    rs2_num <= inst[24:20];
-                    rd_num <= inst[11:7];
+    //             // r-type
+    //             else if (opcode == 'h33) begin
+    //                 func3 <= inst[14:12];
+    //                 func7 <= inst[31:25];
+    //                 rs1_num <= inst[19:15];
+    //                 rs2_num <= inst[24:20];
+    //                 rd_num <= inst[11:7];
 
-                    instAddr <= instAddr + 4;
-                end 
+    //                 instAddr <= instAddr + 4;
+    //             end 
             
-            end
+    //         end
+    //     end
+    //     bool <= !bool;
+    // end
+
+    // assign rd_data = 
+    //     (opcode == 'h13 && func3 == 0) ?
+    //          ((immSmall >= 2048) ? 
+    //             (rs1_data - (4096 - immSmall)) : rs1_data + immSmall) : 
+    //     (opcode == 'h33 && func3 == 0 && func7 == 0) ? 
+    //         rs1_data + rs2_data : 0;
+
+    // assign inst_addr = instAddr;
+    // assign halted = (halt == 1);
+
+    always_ff @ (posedge clk) begin
+        $display(halted);
+        opcode <= inst[6:0];
+        if (opcode == 'h73) begin
+            halted <= 1;
         end
-        bool <= !bool;
+        inst_addr <= inst_addr + 4;
+    end
+    // assign inst_addr = instAddr;
+
+    always_comb begin
+        // input1 = rs1_data;
+        // input2 = rs2_data;
+        // if (opcode == 'h33) begin
+        //     input1 = rs1_data;
+        //     input2 = rs2_data;
+        // end
+        // if (opcode == 'h13) begin
+        //     input1 = rs1_data;
+        //     input2 = immSmall;
+        // end
+        case(opcode)
+        'h33: begin
+            input1 = rs1_data;
+            input2 = rs2_data;
+        end
+        'h13: begin
+            input1 = rs1_data;
+            input2 = immSmall;
+        end
+        default: begin
+            input1 = 0;
+            input2 = 0;
+        end
+        endcase
+        // $display(input1);
+        // $display(input2);
     end
 
-    assign rd_data = 
-        (opcode == 'h13 && func3 == 0) ?
-             ((immSmall >= 2048) ? 
-                (rs1_data - (4096 - immSmall)) : rs1_data + immSmall) : 
-        (opcode == 'h33 && func3 == 0 && func7 == 0) ? 
-            rs1_data + rs2_data : 0;
-
-    assign inst_addr = instAddr;
-    assign halted = (halt == 1);
 endmodule

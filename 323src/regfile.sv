@@ -29,7 +29,6 @@ module regfile(
     assign rs2_data = data[rs2_num];
 
     always_ff @(posedge clk, negedge rst_b) begin
-        $display(data[1]);
         if (rst_b == 0) begin
             int i;
             for (i = 0; i < size; i++)

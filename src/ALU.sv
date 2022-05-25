@@ -13,41 +13,50 @@ ALU Control lines | Function
 */
 
 module ALU (
-    input [31:0] inp1, inp2, 
+    input [31:0] inp1, 
+    input [31:0] inp2, 
     input [3:0] alu_control,
-    output reg [31:0] alu_result,
-    output reg halted
+    output reg [31:0] alu_result
+    // output reg halted
 );
 
-always @(*)
-    begin
-        // Operating based on control input
-        case(alu_control)
+// always @(*)
+//     begin
+//         // Operating based on control input
+//         case(alu_control)
 
-            4'b0000: alu_result = inp1&inp2;
-            4'b0001: alu_result = inp1|inp2;
-            4'b0010: alu_result = inp1+inp2;
-            4'b0100: alu_result = inp1-inp2;
-            4'b1000: begin 
-                if(inp1<inp2)
-                alu_result = 1;
-                else
-                alu_result = 0;
-            end
-            4'b0011: alu_result = inp1<<inp2;
-            4'b0101: alu_result = inp1>>inp2;
-            4'b0110: alu_result = inp1*inp2;
-            4'b0111: alu_result = inp1^inp2;
-            default: alu_result = inp1;
+//             4'b0000: alu_result = inp1&inp2;
+//             4'b0001: alu_result = inp1|inp2;
+//             4'b0010: alu_result = inp1+inp2;
+//             4'b0100: alu_result = inp1-inp2;
+//             4'b1000: begin 
+//                 if(inp1<inp2)
+//                 alu_result = 1;
+//                 else
+//                 alu_result = 0;
+//             end
+//             4'b0011: alu_result = inp1<<inp2;
+//             4'b0101: alu_result = inp1>>inp2;
+//             4'b0110: alu_result = inp1*inp2;
+//             4'b0111: alu_result = inp1^inp2;
+//             default: alu_result = inp1;
 
-        endcase
+//         endcase
 
-        // Setting Zero_flag if ALU_result is zero
-        // if (alu_result == 0)
-        //     halted = 1'b0;
-        // else
-        //     halted = 1'b1;
+//         // Setting Zero_flag if ALU_result is zero
+//         // if (alu_result == 0)
+//         //     halted = 1'b0;
+//         // else
+//         //     halted = 1'b1;
         
-    end
+//     end
+
+always_comb begin
+    case(alu_control)
+    4'b0010: alu_result = inp1 + inp2;
+    4'b0100: alu_result = inp1 - inp2;
+    default: alu_result = inp1;
+endcase
+end
 
 endmodule
