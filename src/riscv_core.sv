@@ -1,5 +1,3 @@
-// `include "src/ALU.sv"
-
 
 
 module riscv_core(
@@ -29,7 +27,6 @@ module riscv_core(
     reg [31:0] input1;
     reg [31:0] input2;
     reg [31:0] instAddr;
-    // reg halt;
     reg bool = 1'b0;
     
     reg [3:0] alu_control;
@@ -77,103 +74,8 @@ module riscv_core(
         input2,
         alu_control,
         rd_data
-        // halted
     );
 
-    // control control_module(
-    //     inst[31:25],
-    //     inst[14:12],
-    //     inst[6:0],
-    //     alu_control,
-    //     rd_we,
-    //     halted
-    // );
-    // ALU alu_module(
-    //     input1,
-    //     input2,
-    //     alu_control,
-    //     rd_data,
-    //     halted
-    // );
-    // 
-    // always @(posedge clk, negedge rst_b) begin
-    //     // rs1_num <= inst[19:15];
-    //     // rs2_num <= inst[24:20];
-    //     rd_num <= inst[11:7];
-    //     // input1 = rs1_data;
-    //     $display("%b", inst);
-    //     // $display("--", rs1_num);
-    //     opcode <= inst[6:0];
-    //     if (opcode == 7'h73) begin
-    //         halted <= 1;
-    //     end
-    //     else if (opcode == 7'h13) begin
-    //         input2 <= {{20{inst[31]}}, inst[31:20]};
-    //     end
-    //     else if (opcode == 7'h33) begin
-    //         input2 <= rs2_data;
-    //     end
-    //     if (rst_b == 0) begin
-    //         instAddr <= 0;
-    //     end
-    //     else
-    //     instAddr <= instAddr + 4;
-    // end
-
-    // assign rs1_num = inst[19:15];
-
-    // assign inst_addr = instAddr;
-
-
-
-    // always_ff @(posedge clk, negedge rst_b) begin
-    //     if (bool == 1'b0) begin  
-    //         if (rst_b == 0) begin
-    //             halt <= 0;
-    //         end
-    //         else begin
-    //             opcode <= inst[6:0];
-                
-    //             // ecall
-    //             if (opcode == 'h73) begin
-    //                 halt <= 1;
-    //             end
-
-    //             // i-type
-    //             else if (opcode == 'h13) begin
-    //                 func3 <= inst[14:12];
-    //                 immSmall[11:0] <= inst[31:20];
-    //                 rs1_num <= inst[19:15];
-    //                 rd_num <= inst[11:7];
-
-    //                 instAddr <= instAddr + 4;
-    //             end
-
-    //             // r-type
-    //             else if (opcode == 'h33) begin
-    //                 func3 <= inst[14:12];
-    //                 func7 <= inst[31:25];
-    //                 rs1_num <= inst[19:15];
-    //                 rs2_num <= inst[24:20];
-    //                 rd_num <= inst[11:7];
-
-    //                 instAddr <= instAddr + 4;
-    //             end 
-            
-    //         end
-    //     end
-    //     bool <= !bool;
-    // end
-
-    // assign rd_data = 
-    //     (opcode == 'h13 && func3 == 0) ?
-    //          ((immSmall >= 2048) ? 
-    //             (rs1_data - (4096 - immSmall)) : rs1_data + immSmall) : 
-    //     (opcode == 'h33 && func3 == 0 && func7 == 0) ? 
-    //         rs1_data + rs2_data : 0;
-
-    // assign inst_addr = instAddr;
-    // assign halted = (halt == 1);
 
     always_ff @ (posedge clk) begin
         $display(halted);
@@ -183,19 +85,9 @@ module riscv_core(
         end
         inst_addr <= inst_addr + 4;
     end
-    // assign inst_addr = instAddr;
 
     always_comb begin
-        // input1 = rs1_data;
-        // input2 = rs2_data;
-        // if (opcode == 'h33) begin
-        //     input1 = rs1_data;
-        //     input2 = rs2_data;
-        // end
-        // if (opcode == 'h13) begin
-        //     input1 = rs1_data;
-        //     input2 = immSmall;
-        // end
+
         case(opcode)
         'h33: begin
             input1 = rs1_data;
