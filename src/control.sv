@@ -5,7 +5,7 @@ module control(
     output reg [4:0] rs2_num,
     output reg [4:0] rd_num,
     output reg [31:0] immSmall,
-    output reg [3:0] alu_control,
+    output reg [3:0] alu_control
 );
     reg[6:0] opcode;
     reg[2:0] funct3;
@@ -77,6 +77,34 @@ module control(
                 alu_control = 4'b0111;
             end
 
+        end
+
+        'h03: begin
+            rs1_num = inst[19:15];
+            rs2_num = {5{1'b0}};
+            rd_num = inst[11:7];
+            funct3 = inst[14:12];
+            immSmall = {{20{inst[31]}}, inst[31:20]};
+            alu_control = 4'b0010;
+
+        end
+
+        'h23: begin
+            rs1_num = inst[19:15];
+            rs2_num = inst[24:20];
+            funct3 = inst[14:12];
+            immSmall = {{20{inst[31]}}, inst[31:25], inst[11:7]};
+            alu_control = 4'b0010;
+
+        end
+
+        // load upper immidiate
+        'h37: begin
+            immSmall = {inst[31:12], {12{1'b0}}};
+            rd_num = inst[11:7];
+            rs1_num = {5{1'b0}};
+            rs2_num = {5{1'b0}};
+            alu_control = 4'b0010;
         end
         
         default: begin
