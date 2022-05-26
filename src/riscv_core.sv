@@ -26,7 +26,6 @@ module riscv_core(
     reg [31:0] input2;
     reg [31:0] instAddr;
     reg bool = 1'b0;
-    reg is_unsigned = 1'b0;
     
     reg [3:0] alu_control;
     reg [6:0] opcode;
@@ -63,8 +62,7 @@ module riscv_core(
         rs2_num,
         rd_num,
         immSmall,
-        alu_control,
-        is_unsigned
+        alu_control
     );
     
     ALU alu_module(
@@ -85,41 +83,12 @@ module riscv_core(
         opcode = inst[6:0];
         case(opcode)
         'h33: begin
-            // if (is_unsigned == 1'b0) begin
-                input1 = rs1_data;
-                input2 = rs2_data;                
-            // end
-            // else begin
-            //     if (rs2_data < 0) begin
-            //         input2 = (2 ** 32) + rs2_data;
-            //     end else begin
-            //         input2 = rs2_data;
-            //     end
-            //     if (rs1_data < 0) begin
-            //         input1 = (2 ** 32) + rs1_data;
-            //     end else begin
-            //         input1 = rs1_data;
-            //     end
-            // end
+            input1 = rs1_data;
+            input2 = rs2_data;                
         end
         'h13: begin
-            // if (is_unsigned == 1'b0) begin
-                input1 = rs1_data;
-                input2 = immSmall;
-            // end
-            // else begin
-            //     if (rs1_data < 0) begin
-            //         input1 = (2 ** 32) + rs1_data;
-            //     end else begin
-            //         input1 = rs1_data;
-            //     end
-            //     if (immSmall < 0) begin
-            //         immSmall = (2 ** 32) + immSmall;
-            //     end else begin
-            //         input2 = immSmall;
-            //     end
-            //     is_unsigned = 1'b0;
-            // end
+            input1 = rs1_data;
+            input2 = immSmall;
         end
         'h73: begin
             halted = 1;

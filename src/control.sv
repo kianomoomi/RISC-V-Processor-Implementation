@@ -6,7 +6,6 @@ module control(
     output reg [4:0] rd_num,
     output reg [31:0] immSmall,
     output reg [3:0] alu_control,
-    output reg is_unsigned
 );
     reg[6:0] opcode;
     reg[2:0] funct3;
@@ -43,8 +42,7 @@ module control(
             end
             // sltu
             if (funct3 == 3 && funct7 == 0) begin
-                alu_control = 4'b0101;
-                is_unsigned = 1'b1;
+                alu_control = 4'b0111;
             end
             // xor
             if (funct3 == 4 && funct7 == 0) begin
@@ -76,8 +74,7 @@ module control(
             end
             // sltiu
             if (funct3 == 3) begin
-                alu_control = 4'b0101;
-                is_unsigned = 1'b1;
+                alu_control = 4'b0111;
             end
 
         end
