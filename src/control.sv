@@ -6,31 +6,21 @@ module control(
     output reg [4:0] rd_num,
     output reg [31:0] immSmall,
     output reg [3:0] alu_control,
-    // input clk,
     output reg is_unsigned
-    // input [31:0] rs1_data,
-    // input [31:0] rs2_data
 );
     reg[6:0] opcode;
     reg[2:0] funct3;
     reg[6:0] funct7;
     reg bool = 1'b0;
 
-    // always @(posedge clk) begin
-    always @(inst) begin
-        // $display("%h", inst);
-        //  if(bool == 1'b0)
-        //  begin
-            // $display("in control: ", inst);
+    always @(inst_addr) begin
+        
         opcode = inst[6:0];
+        
         case(opcode)
         'h33: begin
             rs1_num = inst[19:15];
             rs2_num = inst[24:20];
-            $display("rs1_num control", rs1_num);
-            $display("rs2_num control", rs2_num); 
-            // $display("rs1_data control", rs1_data); 
-            // $display("rs2_data control", rs2_data); 
             rd_num = inst[11:7];
             funct3 = inst[14:12];
             funct7 = inst[31:25];
@@ -62,6 +52,7 @@ module control(
             end
        
         end
+        
         'h13: begin
             rs1_num = inst[19:15];
             rs2_num = {5{1'b0}};
@@ -90,6 +81,7 @@ module control(
             end
 
         end
+        
         default: begin
             rs1_num = 0;
             rs2_num = 0;
@@ -98,11 +90,7 @@ module control(
             alu_control = 4'b1111;
 
         end
-    endcase
-         end
-        //  bool = !bool;
-        
-    // end
-
+        endcase
+    end
 
 endmodule

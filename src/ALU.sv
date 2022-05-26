@@ -16,7 +16,6 @@ module ALU (
 );
 
 always_comb begin
-    $display("in ALU: ", inp1, " + ", inp2);
 
     case(alu_control)
     4'b0001: alu_result = inp1 << inp2;
@@ -26,6 +25,7 @@ always_comb begin
     4'b0110: alu_result = inp1 ^ inp2;
     default: alu_result = inp1;
 endcase
+
 end
 
 endmodule

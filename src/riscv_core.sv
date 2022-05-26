@@ -1,5 +1,3 @@
-
-
 module riscv_core(
     inst_addr,
     inst,
@@ -48,9 +46,6 @@ module riscv_core(
     regfile r(
         .rs1_data(rs1_data),
         .rs2_data(rs2_data),
-        // .rs1_num(inst[19:15]),
-        // .rs2_num(inst[24:20]),
-        // .rd_num(inst[11:7]),
         .rs1_num(rs1_num),
         .rs2_num(rs2_num),
         .rd_num(rd_num),
@@ -69,10 +64,7 @@ module riscv_core(
         rd_num,
         immSmall,
         alu_control,
-        // clk,
         is_unsigned
-        // rs1_data,
-        // rs2_data
     );
     
     ALU alu_module(
@@ -84,21 +76,12 @@ module riscv_core(
 
 
     always_ff @ (posedge clk) begin
-        // $display(halted);
-        // if (opcode == 'h73) begin
-        //     halted <= 1;
-        // end
-        // $display("in core: ", inst_addr);
         if (bool != 1'b0)
         inst_addr <= inst_addr + 4;
         bool = 1'b1;
     end
 
     always_comb begin
-    // always @(posedge clk) begin
-        // $display("in combinational: ", inst);
-        $display("rs2_data: ", rs2_data);
-        $display("rs1_data: ", rs1_data);
         opcode = inst[6:0];
         case(opcode)
         'h33: begin
@@ -146,8 +129,6 @@ module riscv_core(
             input2 = 0;
         end
         endcase
-        // $display(input1);
-        // $display(input2);
     end
 
 endmodule
