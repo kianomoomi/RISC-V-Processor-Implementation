@@ -17,11 +17,18 @@ module ALU (
 
 always_comb begin
 
+    $display("input1: ", inp1);
+    $display("input2: ", inp2);
+
     case(alu_control)
     4'b0001: alu_result = inp1 << inp2;
     4'b0010: alu_result = inp1 + inp2;
     4'b0100: alu_result = inp1 - inp2;
-    4'b0101: alu_result = {{31{1'b0}}, inp1 < inp2};
+    4'b0101: begin
+         alu_result = (inp1[31] == inp2[31]) ? {{31{1'b0}}, inp1 < inp2} :
+                      (inp1[31] == 0 && inp2[31] == 1) ? {32{1'b0}} :
+                      {{31{1'b0}}, 1'b1};
+    end
     4'b0110: alu_result = inp1 ^ inp2;
     default: alu_result = inp1;
 endcase
