@@ -5,7 +5,7 @@ module control(
     output reg [4:0] rs2_num,
     output reg [4:0] rd_num,
     output reg [31:0] immSmall,
-    output reg [3:0] alu_control,
+    output reg [3:0] alu_control
 );
     reg[6:0] opcode;
     reg[2:0] funct3;
@@ -76,6 +76,33 @@ module control(
             if (funct3 == 3) begin
                 alu_control = 4'b0111;
             end
+            //xori
+            if (funct3 == 4) begin
+                alu_control = 4'b0110;
+            end
+            //srli
+            if (funct3 == 5) begin
+                if (immSmall[10] == 0) begin
+                    alu_control = 4'b1000;
+                    immSmall = {{27{1'b0}}, immSmall[4:0]};
+                end
+            end
+            //srai
+            if (funct3 == 5) begin
+                if (immSmall[10] == 1) begin
+                    alu_control = 4'b1001;
+                    immSmall =  {{27{1'b0}}, immSmall[4:0]};
+                end
+            end
+            //ori
+            if (funct3 == 6) begin
+                alu_control = 4'b0011;
+            end
+            //andi
+            if (funct3 == 7) begin
+                alu_control = 4'b0000;
+            end
+
 
         end
         
