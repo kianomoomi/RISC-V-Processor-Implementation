@@ -22,7 +22,7 @@ always_comb begin
     4'b0001: alu_result = inp1 << inp2;
     4'b0010: alu_result = inp1 + inp2;
     4'b0100: alu_result = inp1 - inp2;
-    4'b0101: alu_result = inp1 < inp2;
+    4'b0101: alu_result = {{31{1'b0}}, inp1 < inp2};
     4'b0110: alu_result = inp1 ^ inp2;
     default: alu_result = inp1;
 endcase

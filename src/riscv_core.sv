@@ -70,7 +70,9 @@ module riscv_core(
         immSmall,
         alu_control,
         clk,
-        is_unsigned
+        is_unsigned,
+        rs1_data,
+        rs2_data
     );
     
     ALU alu_module(
@@ -87,7 +89,7 @@ module riscv_core(
         if (opcode == 'h73) begin
             halted <= 1;
         end
-        $display("in core: ", inst_addr);
+        // $display("in core: ", inst_addr);
         if (bool != 1'b0)
         inst_addr <= inst_addr + 4;
         bool = !bool;
@@ -95,44 +97,46 @@ module riscv_core(
 
     always_comb begin
     // always @(posedge clk) begin
-        $display("in combinational: ", inst);
+        // $display("in combinational: ", inst);
+        $display("rs2_data: ", rs2_data);
+        $display("rs1_data: ", rs1_data);
         case(opcode)
         'h33: begin
-            if (is_unsigned == 1'b0) begin
-                input2 = rs2_data;
+            // if (is_unsigned == 1'b0) begin
                 input1 = rs1_data;
-            end
-            else begin
-                if (rs2_data < 0) begin
-                    input2 = (2 ** 32) + rs2_data;
-                end else begin
-                    input2 = rs2_data;
-                end
-                if (rs1_data < 0) begin
-                    input1 = (2 ** 32) + rs1_data;
-                end else begin
-                    input1 = rs1_data;
-                end
-            end
+                input2 = rs2_data;                
+            // end
+            // else begin
+            //     if (rs2_data < 0) begin
+            //         input2 = (2 ** 32) + rs2_data;
+            //     end else begin
+            //         input2 = rs2_data;
+            //     end
+            //     if (rs1_data < 0) begin
+            //         input1 = (2 ** 32) + rs1_data;
+            //     end else begin
+            //         input1 = rs1_data;
+            //     end
+            // end
         end
         'h13: begin
-            if (is_unsigned == 1'b0) begin
-                input2 = immSmall;
+            // if (is_unsigned == 1'b0) begin
                 input1 = rs1_data;
-            end
-            else begin
-                if (rs1_data < 0) begin
-                    input1 = (2 ** 32) + rs1_data;
-                end else begin
-                    input1 = rs1_data;
-                end
-                if (immSmall < 0) begin
-                    immSmall = (2 ** 32) + immSmall;
-                end else begin
-                    input2 = immSmall;
-                end
-                is_unsigned = 1'b0;
-            end
+                input2 = immSmall;
+            // end
+            // else begin
+            //     if (rs1_data < 0) begin
+            //         input1 = (2 ** 32) + rs1_data;
+            //     end else begin
+            //         input1 = rs1_data;
+            //     end
+            //     if (immSmall < 0) begin
+            //         immSmall = (2 ** 32) + immSmall;
+            //     end else begin
+            //         input2 = immSmall;
+            //     end
+            //     is_unsigned = 1'b0;
+            // end
         end
         default: begin
             input1 = 0;
