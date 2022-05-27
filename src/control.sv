@@ -112,7 +112,7 @@ module control(
             rd_num = inst[11:7];
             funct3 = inst[14:12];
             immSmall = {{20{inst[31]}}, inst[31:20]};
-            alu_control = 4'b0010;
+            alu_control = 4'b1101;
 
         end
 
@@ -121,7 +121,7 @@ module control(
             rs2_num = inst[24:20];
             funct3 = inst[14:12];
             immSmall = {{20{inst[31]}}, inst[31:25], inst[11:7]};
-            alu_control = 4'b0010;
+            alu_control = 4'b1100;
 
         end
 

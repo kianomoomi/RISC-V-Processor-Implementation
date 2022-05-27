@@ -11,23 +11,34 @@ ALU Control lines | Function
             0111    set less than unsigned
             1000    shift right (logical)
             1001    shift right (arithmetic)
+            1100    memory store
+            1101    memory load
             
-
-
 */
 
 module ALU (
     input [31:0] inp1, 
     input [31:0] inp2, 
     input [3:0] alu_control,
-    output reg [31:0] alu_result
+    output reg [31:0] alu_result,
+    input [2:0] funct3,
+    output reg [31:0] mem_addr,
+    output reg mem_write_en,
+    input [7:0] mem_data_out [0:3],
+    output [7:0] mem_data_in [0:3],
+    input [31:0] inpin
 );
+
+reg [31:0] temp_result;
 
 always_comb begin
 
-    $display("input1: ", inp1);
-    $display("input2: ", inp2);
-
+    // $display("input1: 0x%h", $signed(inp1));
+    // $display("input2: 0x%h", $signed(inp2));
+    // $display("inpin: 0x%h", $signed(inpin));
+    
+    mem_write_en = 0;
+    
     case(alu_control)
     4'b0000: alu_result = inp1 & inp2;
     4'b0001: alu_result = inp1 << inp2;
@@ -43,11 +54,53 @@ always_comb begin
     // 4'b0111: alu_result = 
     4'b0111:begin
        alu_result =  {{31{1'b0}}, inp1 < inp2};
-       $display("alu :" , inp1<inp2);
-
     end
     4'b1000: alu_result = inp1 >> inp2;
     4'b1001: alu_result = $signed(inp1) >>> $signed(inp2);
+    4'b1100: begin
+        mem_write_en = 1'b1;
+        mem_addr = inp1 + inp2;
+        case(funct3)
+            0: begin
+                mem_data_in[0] = inpin[7:0];
+                mem_data_in[1] = mem_data_out[1];
+                mem_data_in[2] = mem_data_out[2];
+                mem_data_in[3] = mem_data_out[3];
+            end
+            1: begin
+                mem_data_in[0] = inpin[7:0];
+                mem_data_in[1] = inpin[15:8];
+                mem_data_in[2] = mem_data_out[2];
+                mem_data_in[3] = mem_data_out[3];
+            end
+            2: begin
+                mem_data_in[0] = inpin[7:0];
+                mem_data_in[1] = inpin[15:8];
+                mem_data_in[2] = inpin[23:16];
+                mem_data_in[3] = inpin[31:24];
+            end
+        endcase
+    end
+    4'b1101: begin
+        mem_addr = inp1 + inp2;
+        case(funct3)
+            0: begin
+                alu_result = {{24{mem_data_out[0][7]}}, mem_data_out[0]};
+            end
+            1: begin
+                alu_result = {{16{mem_data_out[1][7]}}, mem_data_out[1], mem_data_out[0]};
+            end
+            2: begin
+                alu_result = {mem_data_out[3], mem_data_out[2], mem_data_out[1], mem_data_out[0]};
+            end
+            4: begin
+                alu_result = {{24{1'b0}}, mem_data_out[0]};
+            end
+            5: begin
+                alu_result = {{16{1'b0}}, mem_data_out[1], mem_data_out[0]};
+            end
+        endcase
+    end
     default: alu_result = inp1;
 endcase
 

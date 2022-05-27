@@ -13,8 +13,8 @@ module riscv_core(
     input   [31:0] inst;
     output  reg [31:0] mem_addr;
     input   [7:0]  mem_data_out[0:3];
-    output  reg [7:0]  mem_data_in[0:3];
-    output  reg       mem_write_en;
+    output  [7:0]  mem_data_in[0:3];
+    output         mem_write_en;
     output  reg    halted;
     input          clk;
     input          rst_b;
@@ -24,9 +24,10 @@ module riscv_core(
 
     reg [31:0] input1;
     reg [31:0] input2;
+    reg [31:0] inpin;
     reg [31:0] input_memory1;
     reg [31:0] input_memory2;
-
+    reg [31:0] alu_result;
 
     reg [31:0] instAddr;
     reg bool = 1'b0;
@@ -72,15 +73,21 @@ module riscv_core(
         input1,
         input2,
         alu_control,
-        rd_data
+        rd_data,
+        funct3,
+        mem_addr,
+        mem_write_en,
+        mem_data_out,
+        mem_data_in,
+        inpin
     );
 
-    ALU alu_memory(
-        input_memory1,
-        input_memory2,
-        alu_control,
-        mem_addr
-    );
+    // ALU alu_memory(
+    //     input_memory1,
+    //     input_memory2,
+    //     alu_control,
+    //     mem_addr
+    // );
 
 
     always_ff @ (posedge clk) begin
@@ -95,34 +102,27 @@ module riscv_core(
         case(opcode)
         'h33: begin           
             input1 = rs1_data;
-            input2 = rs2_data;    
+            input2 = rs2_data;
         end
         'h13: begin
             input1 = rs1_data;
-            input2 = immSmall;
+            input2 = immSmall;  
+
         end
         'h37: begin
             input1 = rs1_data;
             input2 = immSmall;
         end
         'h03: begin
-            input_memory1 = rs1_data;
-            input_memory2 = immSmall;
-            if (funct3 == 0) begin
-                rd_data = {{24{1'b0}}, mem_data_out[0]};
-            end 
-            else if (funct3 == 1) begin
-                rd_data = {{16{1'b0}}, mem_data_out[1], mem_data_out[0]};
-            end 
-            else if (funct3 == 2) begin
-                rd_data = {mem_data_out[3], mem_data_out[2], mem_data_out[1], mem_data_out[0]};
-            end
-            else begin
-                rd_data = 0;
-            end
+            input1 = rs1_data;
+            input2 = immSmall;
         end
         'h23: begin
-            
+            input1 = rs1_data;
+            input2 = immSmall;
+            inpin = rs2_data;
+            $display("%h", inpin);
+            rd_num = 0;
         end
         'h73: begin
             halted = 1;
@@ -135,5 +135,14 @@ module riscv_core(
         end
         endcase
     end
+
+    // always @(posedge clk) begin
+    //     if (opcode == 'h03) begin
+    //         mem_addr = alu_result;
+    //     end
+    //     else begin
+    //         mem_addr = 0;
+    //     end
+    // end
 
 endmodule

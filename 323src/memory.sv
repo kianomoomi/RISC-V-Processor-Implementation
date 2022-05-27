@@ -22,7 +22,7 @@ module memory(
     parameter default_file="";
 
     reg [7:0] mem[start:top];
-    wire [31:0] ea = addr & 32'hfffffffc;
+    wire [31:0] ea = addr; //& 32'hfffffffc;
 
     assign data_out[0] = mem[ea];
     assign data_out[1] = mem[ea + 1];
