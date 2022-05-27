@@ -25,8 +25,6 @@ module riscv_core(
     reg [31:0] input1;
     reg [31:0] input2;
     reg [31:0] inpin;
-    reg [31:0] input_memory1;
-    reg [31:0] input_memory2;
     reg [31:0] alu_result;
 
     reg [31:0] instAddr;
@@ -83,12 +81,6 @@ module riscv_core(
         inst_addr
     );
 
-    // ALU alu_memory(
-    //     input_memory1,
-    //     input_memory2,
-    //     alu_control,
-    //     mem_addr
-    // );
 
     reg [31:0] forward = 4;
 
@@ -185,7 +177,7 @@ module riscv_core(
         end
         
         'h6F: begin
-            forward = immSmall;
+            forward = immSmall - 4;
         end
         
         'h73: begin
@@ -195,19 +187,8 @@ module riscv_core(
         default: begin
             input1 = 0;
             input2 = 0;
-            input_memory1 = 0;
-            input_memory2 = 0;
         end
         endcase
     end
-
-    // always @(posedge clk) begin
-    //     if (opcode == 'h03) begin
-    //         mem_addr = alu_result;
-    //     end
-    //     else begin
-    //         mem_addr = 0;
-    //     end
-    // end
 
 endmodule

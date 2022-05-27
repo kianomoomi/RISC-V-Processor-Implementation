@@ -36,10 +36,6 @@ module ALU (
 reg [31:0] temp_result;
 
 always_comb begin
-
-    // $display("input1: 0x%h", $signed(inp1));
-    // $display("input2: 0x%h", $signed(inp2));
-    // $display("inpin: 0x%h", $signed(inpin));
     
     mem_write_en = 0;
     
