@@ -79,7 +79,8 @@ module riscv_core(
         mem_write_en,
         mem_data_out,
         mem_data_in,
-        inpin
+        inpin,
+        inst_addr
     );
 
     // ALU alu_memory(
@@ -89,44 +90,62 @@ module riscv_core(
     //     mem_addr
     // );
 
+    reg [31:0] forward = 4;
 
     always_ff @ (posedge clk) begin
         if (bool != 1'b0)
-        inst_addr <= inst_addr + 4;
+        inst_addr <= inst_addr + forward;
         bool = 1'b1;
     end
 
     always_comb begin
         opcode = inst[6:0];
         funct3 = inst[14:12];
+        forward = 4;
         case(opcode)
+
         'h33: begin           
             input1 = rs1_data;
             input2 = rs2_data;
         end
+        
         'h13: begin
             input1 = rs1_data;
             input2 = immSmall;  
 
         end
+        
         'h37: begin
             input1 = rs1_data;
             input2 = immSmall;
         end
+        
+        'h17: begin
+            input1 = immSmall;
+        end
+        
         'h03: begin
             input1 = rs1_data;
             input2 = immSmall;
         end
+        
         'h23: begin
             input1 = rs1_data;
             input2 = immSmall;
             inpin = rs2_data;
-            $display("%h", inpin);
             rd_num = 0;
         end
+        
+        'h67: begin
+            input1 = rs1_data;
+            input2 = immSmall;
+            forward = ((rs1_data+immSmall) & (-2)) - inst_addr - 4;
+        end
+        
         'h73: begin
             halted = 1;
         end
+        
         default: begin
             input1 = 0;
             input2 = 0;

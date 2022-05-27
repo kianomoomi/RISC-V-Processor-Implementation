@@ -106,6 +106,7 @@ module control(
 
         end
 
+        // load
         'h03: begin
             rs1_num = inst[19:15];
             rs2_num = {5{1'b0}};
@@ -116,6 +117,7 @@ module control(
 
         end
 
+        // store
         'h23: begin
             rs1_num = inst[19:15];
             rs2_num = inst[24:20];
@@ -134,6 +136,25 @@ module control(
             alu_control = 4'b0010;
         end
         
+        // jump and link register
+        'h67: begin
+            rs1_num = inst[19:15];
+            rs2_num = {5{1'b0}};
+            rd_num = inst[11:7];
+            funct3 = inst[14:12];
+            immSmall = {{20{inst[31]}}, inst[31:20]};
+            alu_control = 4'b1010;
+        end
+
+        // add upper immidiate to PC
+        'h17: begin
+            immSmall = {inst[31:12], {12{1'b0}}};
+            rd_num = inst[11:7];
+            rs1_num = {5{1'b0}};
+            rs2_num = {5{1'b0}};
+            alu_control = 4'b1110;
+        end
+
         default: begin
             rs1_num = 0;
             rs2_num = 0;

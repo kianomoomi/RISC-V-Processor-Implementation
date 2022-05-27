@@ -11,8 +11,10 @@ ALU Control lines | Function
             0111    set less than unsigned
             1000    shift right (logical)
             1001    shift right (arithmetic)
+            1010    Jump and Link Register
             1100    memory store
             1101    memory load
+            1110    Add Upper Imm to PC
             
 */
 
@@ -26,7 +28,8 @@ module ALU (
     output reg mem_write_en,
     input [7:0] mem_data_out [0:3],
     output [7:0] mem_data_in [0:3],
-    input [31:0] inpin
+    input [31:0] inpin,
+    input [31:0] inst_addr_inp
 );
 
 reg [31:0] temp_result;
@@ -100,6 +103,12 @@ always_comb begin
                 alu_result = {{16{1'b0}}, mem_data_out[1], mem_data_out[0]};
             end
         endcase
+    end
+    4'b1010: begin
+        alu_result = inst_addr_inp + 4;
+    end
+    4'b1110: begin
+        alu_result = inst_addr_inp + inp1;
     end
     default: alu_result = inp1;
 endcase
