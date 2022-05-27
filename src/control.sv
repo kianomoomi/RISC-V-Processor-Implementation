@@ -126,6 +126,15 @@ module control(
             alu_control = 4'b1100;
 
         end
+        
+        // branch
+        'h63: begin
+            rs1_num = inst[19:15];
+            rs2_num = inst[24:20];
+            funct3 = inst[14:12];
+            immSmall = {{19{inst[31]}}, inst[31], inst[7], inst[30:25], inst[11:8], {1{1'b0}}};
+            alu_control = 4'b1111;
+        end
 
         // load upper immidiate
         'h37: begin

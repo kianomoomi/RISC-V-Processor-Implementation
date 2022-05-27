@@ -135,6 +135,48 @@ module riscv_core(
             inpin = rs2_data;
             rd_num = 0;
         end
+
+        'h63: begin
+            rd_num = 0;
+            case(funct3)
+                0: begin
+                    if (rs1_data == rs2_data)
+                        forward = immSmall;
+                    else
+                        forward = 4;
+                end
+                1: begin
+                    if (rs1_data != rs2_data)
+                        forward = immSmall;
+                    else
+                        forward = 4;
+                end
+                4: begin
+                    if (rs1_data < rs2_data)
+                        forward = immSmall;
+                    else
+                        forward = 4;
+                end
+                5: begin
+                    if (rs1_data >= rs2_data)
+                        forward = immSmall;
+                    else
+                        forward = 4;
+                end
+                6: begin
+                    if ($unsigned(rs1_data) < $unsigned(rs2_data))
+                        forward = immSmall;
+                    else
+                        forward = 4;
+                end
+                7: begin
+                    if ($unsigned(rs1_data) >= $unsigned(rs2_data))
+                        forward = immSmall;
+                    else
+                        forward = 4;
+                end
+            endcase
+        end
         
         'h67: begin
             input1 = rs1_data;
