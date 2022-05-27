@@ -136,6 +136,13 @@ module control(
             alu_control = 4'b1111;
         end
 
+        // jal
+        'h6F: begin
+            rd_num = inst[11:7];
+            immSmall = {{11{inst[31]}}, inst[31], inst[19:12], inst[20], inst[30:21], {1{1'b0}}};
+            alu_control = 4'b1011;
+        end
+
         // load upper immidiate
         'h37: begin
             immSmall = {inst[31:12], {12{1'b0}}};

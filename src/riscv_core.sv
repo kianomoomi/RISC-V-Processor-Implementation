@@ -184,6 +184,10 @@ module riscv_core(
             forward = ((rs1_data+immSmall) & (-2)) - inst_addr - 4;
         end
         
+        'h6F: begin
+            forward = immSmall;
+        end
+        
         'h73: begin
             halted = 1;
         end

@@ -12,6 +12,7 @@ ALU Control lines | Function
             1000    shift right (logical)
             1001    shift right (arithmetic)
             1010    Jump and Link Register
+            1011    Jump and Link 
             1100    memory store
             1101    memory load
             1110    Add Upper Imm to PC
@@ -105,6 +106,9 @@ always_comb begin
         endcase
     end
     4'b1010: begin
+        alu_result = inst_addr_inp + 4;
+    end
+    4'b1011: begin
         alu_result = inst_addr_inp + 4;
     end
     4'b1110: begin
