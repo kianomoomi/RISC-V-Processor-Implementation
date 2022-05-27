@@ -1,4 +1,4 @@
-module control(
+module Control_Unit(
     input[31:0] inst,
     input [31:0] inst_addr,
     output reg [4:0] rs1_num,
@@ -8,7 +8,7 @@ module control(
     output reg [3:0] alu_control
 );
     reg[6:0] opcode;
-    reg[2:0] funct3;
+    reg[2:0] funct3;    
     reg[6:0] funct7;
     reg bool = 1'b0;
 
@@ -56,7 +56,6 @@ module control(
             rs2_num = {5{1'b0}};
             rd_num = inst[11:7];
             funct3 = inst[14:12];
-            // funct7 = inst[31:25];
             immSmall = {{20{inst[31]}}, inst[31:20]};
 
             // addi
@@ -133,6 +132,7 @@ module control(
             rs2_num = inst[24:20];
             funct3 = inst[14:12];
             immSmall = {{19{inst[31]}}, inst[31], inst[7], inst[30:25], inst[11:8], {1{1'b0}}};
+            // we assign 1111 to alu_control because registers should'nt change
             alu_control = 4'b1111;
         end
 

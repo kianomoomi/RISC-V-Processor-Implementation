@@ -57,7 +57,7 @@ module riscv_core(
         .halted(halted)
     );
 
-    control control_module(
+    Control_Unit control_module(
         inst,
         inst_addr,
         rs1_num,
@@ -84,10 +84,14 @@ module riscv_core(
 
     reg [31:0] forward = 4;
 
-    always_ff @ (posedge clk) begin
-        if (bool != 1'b0)
-        inst_addr <= inst_addr + forward;
+    always_ff @(posedge clk) begin
+        if (bool != 1'b0) begin
+            inst_addr <= inst_addr + forward;
+        end
         bool = 1'b1;
+        if (opcode == 'h73) begin
+            halted <= 1;
+        end
     end
 
     always_comb begin
@@ -144,13 +148,13 @@ module riscv_core(
                         forward = 4;
                 end
                 4: begin
-                    if (rs1_data < rs2_data)
+                    if ($signed(rs1_data) < $signed(rs2_data))
                         forward = immSmall;
                     else
                         forward = 4;
                 end
                 5: begin
-                    if (rs1_data >= rs2_data)
+                    if ($signed(rs1_data) >= $signed(rs2_data))
                         forward = immSmall;
                     else
                         forward = 4;
@@ -173,16 +177,16 @@ module riscv_core(
         'h67: begin
             input1 = rs1_data;
             input2 = immSmall;
-            forward = ((rs1_data+immSmall) & (-2)) - inst_addr - 4;
+            forward = ((rs1_data+immSmall) & (-2)) - inst_addr;
         end
         
         'h6F: begin
-            forward = immSmall - 4;
+            forward = immSmall;
         end
         
-        'h73: begin
-            halted = 1;
-        end
+        // 'h73: begin
+        //     halted = 1;
+        // end
         
         default: begin
             input1 = 0;
