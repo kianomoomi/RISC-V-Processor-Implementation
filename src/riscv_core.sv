@@ -20,8 +20,6 @@ module riscv_core(
     input          rst_b;
 
 
-
-
     reg [31:0] input1;
     reg [31:0] input2;
     reg [31:0] inpin;
@@ -65,6 +63,16 @@ module riscv_core(
         rd_num,
         immSmall,
         alu_control
+    );
+
+    Cache cache (
+        .cache_addr(mem_addr),
+        .cache_hit(),
+        .cache_data_out,
+        .cache_data_in,
+        .clk,
+        .cache_we,
+        .reset
     );
     
     ALU alu_module(
