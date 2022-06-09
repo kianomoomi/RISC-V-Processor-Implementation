@@ -18,7 +18,7 @@ module riscv_core(
     output  reg    halted;
     input          clk;
     input          rst_b;
-
+    
 
     reg [31:0] input1;
     reg [31:0] input2;
@@ -41,6 +41,13 @@ module riscv_core(
     reg [31:0] immSmall;
     reg rd_we;
 
+    reg cache_hit;
+    reg [7:0] cache_data_out[0:3];
+    reg [7:0] cache_data_in[0:3];
+    reg [31:0] cache_addr;
+    reg cache_we;
+    reg interupt_start;
+    reg interupt_stop;
 
     regfile r(
         .rs1_data(rs1_data),
@@ -66,39 +73,68 @@ module riscv_core(
     );
 
     Cache cache (
-        .cache_addr(mem_addr),
-        .cache_hit(),
-        .cache_data_out,
-        .cache_data_in,
-        .clk,
-        .cache_we,
-        .reset
+        .cache_addr(cache_addr),
+        .cache_hit(cache_hit),
+        .cache_data_out(cache_data_out),
+        .cache_data_in(cache_data_in),
+        .clk(clk),
+        .cache_we(cache_we),
+        .reset(rst_b),
+        .mem_data_in(mem_data_in),
+        .mem_data_out(mem_data_out),
+        .mem_addr(mem_addr),
+        .mem_we(mem_write_en),
+        .interupt_start(interupt_start),
+        .interupt_stop(interupt_stop)
     );
     
+    // ALU alu_module(
+    //     input1,
+    //     input2,
+    //     alu_control,
+    //     rd_data,
+    //     funct3,
+    //     mem_addr,
+    //     mem_write_en,
+    //     mem_data_out,
+    //     mem_data_in,
+    //     inpin,
+    //     inst_addr
+    // );
+
     ALU alu_module(
         input1,
         input2,
         alu_control,
         rd_data,
         funct3,
-        mem_addr,
-        mem_write_en,
-        mem_data_out,
-        mem_data_in,
+        cache_addr,
+        cache_we,
+        cache_data_out,
+        cache_data_in,
         inpin,
         inst_addr
     );
 
 
     reg [31:0] forward = 4;
-
+    reg [2:0] counter = 0;
     always_ff @(posedge clk) begin
+        if(interupt_start)begin
+            counter <= counter + 1;
+            if(counter == 4) begin
+                interupt_stop <= 1;
+                counter <= 0;
+            end
+        end
+        else begin
         if (bool != 1'b0) begin
             inst_addr <= inst_addr + forward;
         end
         bool = 1'b1;
         if (opcode == 'h73) begin
             halted <= 1;
+        end
         end
     end
 
@@ -128,11 +164,13 @@ module riscv_core(
             input1 = immSmall;
         end
         
+        // load
         'h03: begin
             input1 = rs1_data;
             input2 = immSmall;
         end
         
+        // store
         'h23: begin
             input1 = rs1_data;
             input2 = immSmall;
