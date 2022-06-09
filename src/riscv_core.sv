@@ -124,7 +124,7 @@ module riscv_core(
     always_ff @(posedge clk) begin
         if (interupt_start) begin
             counter <= counter + 1;
-            instrupt_stop <= 0;
+            interupt_stop <= 0;
             if (counter == 4) begin
                 interupt_stop <= 1;
                 counter <= 0;
@@ -132,7 +132,7 @@ module riscv_core(
         end
         else if (interupt_second) begin
             counter <= counter + 1;
-            instrupt_stop <= 0;
+            interupt_stop <= 0;
             if (counter == 4) begin
                 interupt_stop <= 1;
                 counter <= 0;

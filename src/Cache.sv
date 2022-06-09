@@ -79,19 +79,33 @@ module Cache (
                         mem_data_in[1] <= data_array[current_block][15:8];
                         mem_data_in[2] <= data_array[current_block][23:16];
                         mem_data_in[3] <= data_array[current_block][31:24];
-                        instrupt_start <= 1;
+                        interupt_start <= 1;
+                        interupt_second <= 1;
                         if (interupt_stop == 1) begin
                             interupt_start <= 1;
                             data_array[current_block] <= 0;
                             tag_array[current_block] <= 0;
                             v_array[current_block] <= 0;
                             dirty_array[current_block] <= 0;
-                            interupt_second <= 1;
                         end
                     end
                     // dirty write
                     else begin
-                        
+                        mem_addr <= {tag_array[current_block], current_block, current_byte};
+                        mem_we <= 1;
+                        mem_data_in[0] <= data_array[current_block][7:0];
+                        mem_data_in[1] <= data_array[current_block][15:8];
+                        mem_data_in[2] <= data_array[current_block][23:16];
+                        mem_data_in[3] <= data_array[current_block][31:24];
+                        interupt_start <= 1;
+                        interupt_second <= 1;
+                        if (interupt_stop == 1) begin
+                            interupt_start <= 1;
+                            data_array[current_block] <= 0;
+                            tag_array[current_block] <= 0;
+                            v_array[current_block] <= 0;
+                            dirty_array[current_block] <= 0;
+                        end
                     end
                 end
                 else begin
@@ -105,7 +119,10 @@ module Cache (
                             tag_array[current_block] <= current_tag;
                             v_array[current_block] <= 1;
                             dirty_array[current_block] <= 0;
-                            cache_data_out <= mem_data_out;
+                            cache_data_out[0] <= mem_data_out[0];
+                            cache_data_out[1] <= mem_data_out[1];
+                            cache_data_out[2] <= mem_data_out[2];
+                            cache_data_out[3] <= mem_data_out[3];
                         end
                     end
                     // clean write but sth stored in cache
@@ -142,7 +159,10 @@ module Cache (
                     tag_array[current_block] <= current_tag;
                     v_array[current_block] <= 1;
                     dirty_array[current_block] <= 0;
-                    cache_data_out <= mem_data_out;
+                    cache_data_out[0] <= mem_data_out[0];
+                    cache_data_out[1] <= mem_data_out[1];
+                    cache_data_out[2] <= mem_data_out[2];
+                    cache_data_out[3] <= mem_data_out[3];
                 end
             end
             else begin
