@@ -66,10 +66,43 @@ module Cache (
             end
             else begin
                 if (dirty_array[current_block] == 1) begin
-                    
+                    if (!cache_we) begin
+                        
+                    end
+                    else begin
+                        
+                    end
                 end
                 else begin
-                    
+                    if (!cache_we) begin
+                        mem_addr <= cache_addr;
+                        interupt_start <= 1;
+                        if (interupt_stop == 1) begin
+                            interupt_start <= 0;
+                            data_array[current_block] <= {mem_data_out[3], mem_data_out[2], mem_data_out[1], mem_data_out[0]};
+                            tag_array[current_block] <= current_tag;
+                            v_array[current_block] <= 1;
+                            dirty_array[current_block] <= 0;
+                            cache_data_out <= mem_data_out;
+                        end
+                    end
+                    else begin
+                        mem_addr <= cache_addr;
+                        mem_we <= 1;
+                        mem_data_in[0] <= cache_data_in[0];
+                        mem_data_in[1] <= cache_data_in[1];
+                        mem_data_in[2] <= cache_data_in[2];
+                        mem_data_in[3] <= cache_data_in[3];
+                        interupt_start <= 1;
+                        if (interupt_stop == 1) begin
+                            interupt_start <= 0;
+                            data_array[current_block] <= {cache_data_in[3], cache_data_in[2], cache_data_in[1], cache_data_in[0]};
+                            tag_array[current_block] <= current_tag;
+                            v_array[current_block] <= 1;
+                            dirty_array[current_block] <= 0;
+                            // cache_data_out <= mem_data_out;
+                        end
+                    end
                 end
             end
 
