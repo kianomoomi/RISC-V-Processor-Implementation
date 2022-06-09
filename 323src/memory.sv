@@ -30,6 +30,10 @@ module memory(
     assign data_out[3] = mem[ea + 3];
 
     always_ff @(posedge clk, negedge rst_b) begin
+        $display("-------------");
+        $display("%h",{mem['d11], mem['d10],mem['d9],mem['d8]});
+        $display("%h",{mem['d23], mem['d22],mem['d21],mem['d20]});
+        $display("-------------");
         if (rst_b == 0) begin
             integer i;
             if (has_default) begin

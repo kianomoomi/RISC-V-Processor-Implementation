@@ -46,9 +46,11 @@ module riscv_core(
     reg [7:0] cache_data_in[0:3];
     reg [31:0] cache_addr;
     reg cache_we;
-    reg interupt_start;
-    reg interupt_second;
+    reg interupt_start = 0;
+    reg interupt_second = 0;
     reg interupt_stop = 0;
+
+    reg bool2 = 1'b0;
 
     regfile r(
         .rs1_data(rs1_data),
@@ -80,14 +82,15 @@ module riscv_core(
         .cache_data_in(cache_data_in),
         .clk(clk),
         .cache_we(cache_we),
-        .reset(rst_b),
+        .rst_b(rst_b),
         .mem_data_in(mem_data_in),
         .mem_data_out(mem_data_out),
         .mem_addr(mem_addr),
         .mem_we(mem_write_en),
         .interupt_start(interupt_start),
         .interupt_second(interupt_second),
-        .interupt_stop(interupt_stop)
+        .interupt_stop(interupt_stop),
+        .opcode(opcode)
     );
     
     // ALU alu_module(
@@ -122,15 +125,29 @@ module riscv_core(
     reg [31:0] forward = 4;
     reg [2:0] counter = 0;
     always_ff @(posedge clk) begin
-        if (interupt_start) begin
+         $display("\n");
+        $display("%h", inst_addr);
+        $display("%h", inst);
+       
+        //  if (opcode == 'h73) begin
+        //     halted <= 1;
+        // end
+         if (opcode == 'h03) begin
+            halted <= 1;
+        end
+
+        if (interupt_start == 1) begin
+            $display("interupt_start");
             counter <= counter + 1;
             interupt_stop <= 0;
             if (counter == 4) begin
+                $display("interupt_stoppppp");
                 interupt_stop <= 1;
                 counter <= 0;
             end
         end
-        else if (interupt_second) begin
+        else if (interupt_second == 1) begin
+            $display("interupt_second");
             counter <= counter + 1;
             interupt_stop <= 0;
             if (counter == 4) begin
@@ -140,12 +157,20 @@ module riscv_core(
         end
         else begin
         if (bool != 1'b0) begin
-            inst_addr <= inst_addr + forward;
+            $display("hi");
+            $display("%h", opcode);  
+            if ((opcode == 7'h23 || opcode == 7'h03) && bool2==1'b0) begin
+                $display("hi3");
+                inst_addr <= inst_addr;
+                bool2 <= 1'b1;
+            end
+            else begin
+                inst_addr <= inst_addr + forward;
+                bool2 <= 1'b0;
+            end
         end
         bool = 1'b1;
-        if (opcode == 'h73) begin
-            halted <= 1;
-        end
+       
         end
     end
 
@@ -186,6 +211,7 @@ module riscv_core(
             input1 = rs1_data;
             input2 = immSmall;
             inpin = rs2_data;
+            $display("%h", inpin);
             rd_num = 0;
         end
 

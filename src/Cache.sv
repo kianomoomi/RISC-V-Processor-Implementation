@@ -5,14 +5,15 @@ module Cache (
     cache_data_in,
     clk,
     cache_we,
-    reset,
+    rst_b,
     mem_data_in,
     mem_data_out,
     mem_addr,
     mem_we,
     interupt_start,
     interupt_second,
-    interupt_stop
+    interupt_stop,
+    opcode
 );
 
     parameter ARRAY_SIZE = (2**11)-1;
@@ -20,7 +21,7 @@ module Cache (
     input [31:0] cache_addr;
     input cache_we;
     input clk;
-    input reset;
+    input rst_b;
     output reg cache_hit;
     input [7:0] cache_data_in[0:3];
     output reg [7:0] cache_data_out[0:3];
@@ -31,7 +32,8 @@ module Cache (
     output reg interupt_start;
     output reg interupt_second;
     input reg interupt_stop;
-
+    input[6:0] opcode;
+    reg bool;
     reg v_array [0:ARRAY_SIZE];
     reg dirty_array [0:ARRAY_SIZE];
     reg [18:0] tag_array [0:ARRAY_SIZE];
@@ -48,13 +50,26 @@ module Cache (
     assign current_byte = cache_addr[1:0];
     assign current_tag = cache_addr[31:13];
 
-    always_ff @(posedge clk) begin 
+    always_ff @(posedge clk, negedge rst_b) begin 
+        if(rst_b == 0) begin
+            integer i;
+            for(i = 0; i <= ARRAY_SIZE; i = i + 1) begin
+                v_array[i] <= 0;
+                dirty_array[i] <= 0;
+                tag_array[i] <= 0;
+                data_array[i] <= 0;
+            end
+        end
+        if (opcode == 'h23 || opcode == 'h03 || opcode == 'h73) begin
+        if(bool == 0)
+        begin
         // already in cache
         if (v_array[current_block] == 1) begin
             
             if (tag_array[current_block] == current_tag) begin
                 // clean read
                 if (!cache_we) begin
+                    $display("cache hit");
                     cache_data_out[0] <= data_array[current_block][7:0];
                     cache_data_out[1] <= data_array[current_block][15:8];
                     cache_data_out[2] <= data_array[current_block][23:16];
@@ -63,6 +78,7 @@ module Cache (
                 end
                 // clean write
                 else begin 
+                    $display("write");
                     data_array[current_block] <= {cache_data_in[3], cache_data_in[2], cache_data_in[1], cache_data_in[0]};
                     dirty_array[current_block] <= 1;
                 end
@@ -82,7 +98,7 @@ module Cache (
                         interupt_start <= 1;
                         interupt_second <= 1;
                         if (interupt_stop == 1) begin
-                            interupt_start <= 1;
+                            interupt_start <= 0;
                             data_array[current_block] <= 0;
                             tag_array[current_block] <= 0;
                             v_array[current_block] <= 0;
@@ -100,7 +116,7 @@ module Cache (
                         interupt_start <= 1;
                         interupt_second <= 1;
                         if (interupt_stop == 1) begin
-                            interupt_start <= 1;
+                            interupt_start <= 0;
                             data_array[current_block] <= 0;
                             tag_array[current_block] <= 0;
                             v_array[current_block] <= 0;
@@ -155,6 +171,7 @@ module Cache (
                 interupt_start <= 1;
                 if (interupt_stop == 1) begin
                     interupt_start <= 0;
+                    interupt_second <= 0;
                     data_array[current_block] <= {mem_data_out[3], mem_data_out[2], mem_data_out[1], mem_data_out[0]};
                     tag_array[current_block] <= current_tag;
                     v_array[current_block] <= 1;
@@ -167,6 +184,7 @@ module Cache (
             end
             else begin
                 // write to memory and store in cache
+                $display("write to memory");
                 mem_addr <= cache_addr;
                 mem_we <= 1;
                 mem_data_in[0] <= cache_data_in[0];
@@ -175,14 +193,20 @@ module Cache (
                 mem_data_in[3] <= cache_data_in[3];
                 interupt_start <= 1;
                 if (interupt_stop == 1) begin
+                    $display("interupt_stop == 1");
                     interupt_start <= 0;
+                    interupt_second <= 0;
                     data_array[current_block] <= {cache_data_in[3], cache_data_in[2], cache_data_in[1], cache_data_in[0]};
                     tag_array[current_block] <= current_tag;
                     v_array[current_block] <= 1;
                     dirty_array[current_block] <= 0;
                     // cache_data_out <= mem_data_out;
+                    bool <= 1;
                 end
             end
+        end
+        end
+        else bool <= 0;
         end
     end
 
