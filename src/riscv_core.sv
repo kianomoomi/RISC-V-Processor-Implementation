@@ -47,7 +47,8 @@ module riscv_core(
     reg [31:0] cache_addr;
     reg cache_we;
     reg interupt_start;
-    reg interupt_stop;
+    reg interupt_second;
+    reg interupt_stop = 0;
 
     regfile r(
         .rs1_data(rs1_data),
@@ -85,6 +86,7 @@ module riscv_core(
         .mem_addr(mem_addr),
         .mem_we(mem_write_en),
         .interupt_start(interupt_start),
+        .interupt_second(interupt_second),
         .interupt_stop(interupt_stop)
     );
     
@@ -120,9 +122,18 @@ module riscv_core(
     reg [31:0] forward = 4;
     reg [2:0] counter = 0;
     always_ff @(posedge clk) begin
-        if(interupt_start)begin
+        if (interupt_start) begin
             counter <= counter + 1;
-            if(counter == 4) begin
+            instrupt_stop <= 0;
+            if (counter == 4) begin
+                interupt_stop <= 1;
+                counter <= 0;
+            end
+        end
+        else if (interupt_second) begin
+            counter <= counter + 1;
+            instrupt_stop <= 0;
+            if (counter == 4) begin
                 interupt_stop <= 1;
                 counter <= 0;
             end
