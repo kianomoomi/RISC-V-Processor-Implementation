@@ -130,12 +130,12 @@ module riscv_core(
         // $display("%h", inst_addr);
         // $display("%h", inst);
        
-        //  if (opcode == 'h73) begin
-        //     halted <= 1;
-        // end
-         if (opcode == 'h03) begin
+         if (opcode == 'h73) begin
             halted <= 1;
         end
+        //  if (opcode == 'h03) begin
+        //     halted <= 1;
+        // end
 
         if (interupt_start == 1) begin
             // $display("interupt_start");
