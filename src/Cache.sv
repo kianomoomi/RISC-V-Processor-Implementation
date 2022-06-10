@@ -70,72 +70,74 @@ module Cache (
         if (v_array[current_block] == 1) begin
             
             if (tag_array[current_block] == current_tag) begin
+
                 // clean read
                 if (!cache_we) begin
-                    // $display("cache hit");
                     case(funct3)
+
                     // load byte
                     3'd0: begin
                         case(current_byte)
                         2'd0: begin
-                        cache_data_out[0] <= data_array[current_block][7:0];
-                        cache_data_out[1] <= {8{data_array[current_block][7]}};
-                        cache_data_out[2] <= {8{data_array[current_block][7]}};
-                        cache_data_out[3] <= {8{data_array[current_block][7]}};
+                            cache_data_out[0] <= data_array[current_block][7:0];
+                            cache_data_out[1] <= {8{data_array[current_block][7]}};
+                            cache_data_out[2] <= {8{data_array[current_block][7]}};
+                            cache_data_out[3] <= {8{data_array[current_block][7]}};
                         end
                         2'd1: begin
-                        cache_data_out[0] <= data_array[current_block][15:8];
-                        cache_data_out[1] <= {8{data_array[current_block][15]}};
-                        cache_data_out[2] <= {8{data_array[current_block][15]}};
-                        cache_data_out[3] <= {8{data_array[current_block][15]}};
+                            cache_data_out[0] <= data_array[current_block][15:8];
+                            cache_data_out[1] <= {8{data_array[current_block][15]}};
+                            cache_data_out[2] <= {8{data_array[current_block][15]}};
+                            cache_data_out[3] <= {8{data_array[current_block][15]}};
                         end
                         2'd2: begin
-                        cache_data_out[0] <= data_array[current_block][23:16];
-                        cache_data_out[1] <= {8{data_array[current_block][23]}};
-                        cache_data_out[2] <= {8{data_array[current_block][23]}};
-                        cache_data_out[3] <= {8{data_array[current_block][23]}};
+                            cache_data_out[0] <= data_array[current_block][23:16];
+                            cache_data_out[1] <= {8{data_array[current_block][23]}};
+                            cache_data_out[2] <= {8{data_array[current_block][23]}};
+                            cache_data_out[3] <= {8{data_array[current_block][23]}};
                         end
                         2'd3: begin
-                        cache_data_out[0] <= data_array[current_block][31:24];
-                        cache_data_out[1] <= {8{data_array[current_block][31]}};
-                        cache_data_out[2] <= {8{data_array[current_block][31]}};
-                        cache_data_out[3] <= {8{data_array[current_block][31]}};
+                            cache_data_out[0] <= data_array[current_block][31:24];
+                            cache_data_out[1] <= {8{data_array[current_block][31]}};
+                            cache_data_out[2] <= {8{data_array[current_block][31]}};
+                            cache_data_out[3] <= {8{data_array[current_block][31]}};
                         end
 
                         endcase
-
                         cache_hit <= 1;
                     end
+
                     // load halfword
                     3'd1: begin
                         case(current_byte)
                         2'd0: begin
-                        cache_data_out[0] <= data_array[current_block][7:0];
-                        cache_data_out[1] <= data_array[current_block][15:8];
-                        cache_data_out[2] <= {8{data_array[current_block][15]}};
-                        cache_data_out[3] <= {8{data_array[current_block][15]}};
+                            cache_data_out[0] <= data_array[current_block][7:0];
+                            cache_data_out[1] <= data_array[current_block][15:8];
+                            cache_data_out[2] <= {8{data_array[current_block][15]}};
+                            cache_data_out[3] <= {8{data_array[current_block][15]}};
                         end
                         2'd1: begin
-                        cache_data_out[0] <= data_array[current_block][15:8];
-                        cache_data_out[1] <= data_array[current_block][23:16];
-                        cache_data_out[2] <= {8{data_array[current_block][23]}};
-                        cache_data_out[3] <= {8{data_array[current_block][23]}};
+                            cache_data_out[0] <= data_array[current_block][15:8];
+                            cache_data_out[1] <= data_array[current_block][23:16];
+                            cache_data_out[2] <= {8{data_array[current_block][23]}};
+                            cache_data_out[3] <= {8{data_array[current_block][23]}};
                         end
                         2'd2: begin
-                        cache_data_out[0] <= data_array[current_block][23:16];
-                        cache_data_out[1] <= data_array[current_block][31:24];
-                        cache_data_out[2] <= {8{data_array[current_block][31]}};
-                        cache_data_out[3] <= {8{data_array[current_block][31]}};
+                            cache_data_out[0] <= data_array[current_block][23:16];
+                            cache_data_out[1] <= data_array[current_block][31:24];
+                            cache_data_out[2] <= {8{data_array[current_block][31]}};
+                            cache_data_out[3] <= {8{data_array[current_block][31]}};
                         end
                         2'd3: begin
-                        cache_data_out[0] <= data_array[current_block][31:24];
-                        cache_data_out[1] <= data_array[current_block][7:0];
-                        cache_data_out[2] <= {8{data_array[current_block][7]}};
-                        cache_data_out[3] <= {8{data_array[current_block][7]}};
+                            cache_data_out[0] <= data_array[current_block][31:24];
+                            cache_data_out[1] <= data_array[current_block][7:0];
+                            cache_data_out[2] <= {8{data_array[current_block][7]}};
+                            cache_data_out[3] <= {8{data_array[current_block][7]}};
                         end
                         endcase
                         cache_hit <= 1;
                     end
+
                     // load word
                     3'd2: begin
                         cache_data_out[0] <= data_array[current_block][7:0];
@@ -144,6 +146,7 @@ module Cache (
                         cache_data_out[3] <= data_array[current_block][31:24];
                         cache_hit <= 1;
                     end
+
                     // load byte unsigned
                     3'd4: begin
                         case(current_byte)
@@ -157,6 +160,7 @@ module Cache (
                         cache_data_out[3] <= {8{1'b0}};
                         cache_hit <= 1;
                     end
+
                     // load halfword unsigned
                     3'd5: begin
                         case(current_byte)
@@ -182,6 +186,7 @@ module Cache (
                         cache_data_out[3] <= {8{1'b0}};
                         cache_hit <= 1;
                     end
+
                     default: begin
                         cache_data_out[0] <= {8{1'b0}};
                         cache_data_out[1] <= {8{1'b0}};
@@ -190,16 +195,14 @@ module Cache (
                     end
 
                 endcase
-                   
                 end
+
                 // clean write
                 else begin 
-                    $display("write");
                     case(funct3)
+
                     // store byte
                     3'd0: begin
-                        $display("store byte");
-                        // data_array[current_block] <= {cache_data_out[3], cache_data_out[2], cache_data_out[1], cache_data_in[0]};
                         case(current_byte)
                         2'd0:
                             data_array[current_block] <= {data_array[current_block][31:24], data_array[current_block][23:16], data_array[current_block][15:8], cache_data_in[0]};
@@ -213,19 +216,18 @@ module Cache (
                         endcase
                         dirty_array[current_block] <= 1;
                     end
+
                     // store halfword
                     3'd1: begin
-                        // data_array[current_block] <= {cache_data_out[3], cache_data_out[2], cache_data_in[1], cache_data_in[0]};
                         case(current_byte)
                         2'd0: data_array[current_block] <= {data_array[current_block][31:24], data_array[current_block][23:16], cache_data_in[1], cache_data_in[0]};
                         2'd1: data_array[current_block] <= {data_array[current_block][31:24], cache_data_in[1], cache_data_in[0], data_array[current_block][7:0]};
                         2'd2: data_array[current_block] <= {cache_data_in[1], cache_data_in[0], data_array[current_block][15:8], data_array[current_block][7:0]};
                         2'd3: data_array[current_block] <= {cache_data_in[0], data_array[current_block][23:16], data_array[current_block][15:8], cache_data_in[1]};
-
-
                         endcase
                         dirty_array[current_block] <= 1;
                     end
+
                     // store word
                     3'd2: begin
                         data_array[current_block] <= {cache_data_in[3], cache_data_in[2], cache_data_in[1], cache_data_in[0]};
@@ -239,6 +241,7 @@ module Cache (
                 end
 
             end
+
             else begin
                 // dirty functions
                 if (dirty_array[current_block] == 1) begin
@@ -285,6 +288,7 @@ module Cache (
                         dirty_array[current_block] <= 0;
                     end
                 end
+
                 else begin
                     // clean read but sth stored in cache
                     if (!cache_we) begin
@@ -296,52 +300,52 @@ module Cache (
                             v_array[current_block] <= 1;
                             dirty_array[current_block] <= 0;
                         case(funct3)
-                    // load byte
-                    3'd0: begin
-                        data_array[current_block] <= {data_array[current_block][31:24], data_array[current_block][23:16], data_array[current_block][15:8], mem_data_out[0]};
-                        cache_data_out[0] <= mem_data_out[0];
-                        cache_data_out[1] <= data_array[current_block][15:8];
-                        cache_data_out[2] <= data_array[current_block][23:16];
-                        cache_data_out[3] <= data_array[current_block][31:24];
-                    end
-                    // load halfword
-                    3'd1: begin
-                        data_array[current_block] <= {data_array[current_block][31:24], data_array[current_block][23:16], mem_data_out[1], mem_data_out[0]};
-                        cache_data_out[0] <= mem_data_out[0];
-                        cache_data_out[1] <= mem_data_out[1];
-                        cache_data_out[2] <= data_array[current_block][23:16];
-                        cache_data_out[3] <= data_array[current_block][31:24];
-                    end
-                    // load word
-                    3'd2: begin
-                        data_array[current_block] <= {mem_data_out[3], mem_data_out[2], mem_data_out[1], mem_data_out[0]};
-                        cache_data_out[0] <= mem_data_out[0];
-                        cache_data_out[1] <= mem_data_out[1];
-                        cache_data_out[2] <= mem_data_out[2];
-                        cache_data_out[3] <= mem_data_out[3];
-                    end
-                    // load byte unsigned
-                    3'd4: begin
-                        data_array[current_block] <= {{24{1'b0}}, mem_data_out[0]};
-                        cache_data_out[0] <= mem_data_out[0];
-                        cache_data_out[1] <= {8{1'b0}};
-                        cache_data_out[2] <= {8{1'b0}};
-                        cache_data_out[3] <= {8{1'b0}};
-                    end
-                    // load halfword unsigned
-                    3'd5: begin
-                        data_array[current_block] <= {{16{1'b0}}, mem_data_out[1], mem_data_out[0]};
-                        cache_data_out[0] <= mem_data_out[0];
-                        cache_data_out[1] <= mem_data_out[1];
-                        cache_data_out[2] <= {8{1'b0}};
-                        cache_data_out[3] <= {8{1'b0}};
-                    end
-                    default: begin
-                        cache_data_out[0] <= {8{1'b0}};
-                        cache_data_out[1] <= {8{1'b0}};
-                        cache_data_out[2] <= {8{1'b0}};
-                        cache_data_out[3] <= {8{1'b0}};
-                    end
+                        // load byte
+                        3'd0: begin
+                            data_array[current_block] <= {data_array[current_block][31:24], data_array[current_block][23:16], data_array[current_block][15:8], mem_data_out[0]};
+                            cache_data_out[0] <= mem_data_out[0];
+                            cache_data_out[1] <= data_array[current_block][15:8];
+                            cache_data_out[2] <= data_array[current_block][23:16];
+                            cache_data_out[3] <= data_array[current_block][31:24];
+                        end
+                        // load halfword
+                        3'd1: begin
+                            data_array[current_block] <= {data_array[current_block][31:24], data_array[current_block][23:16], mem_data_out[1], mem_data_out[0]};
+                            cache_data_out[0] <= mem_data_out[0];
+                            cache_data_out[1] <= mem_data_out[1];
+                            cache_data_out[2] <= data_array[current_block][23:16];
+                            cache_data_out[3] <= data_array[current_block][31:24];
+                        end
+                        // load word
+                        3'd2: begin
+                            data_array[current_block] <= {mem_data_out[3], mem_data_out[2], mem_data_out[1], mem_data_out[0]};
+                            cache_data_out[0] <= mem_data_out[0];
+                            cache_data_out[1] <= mem_data_out[1];
+                            cache_data_out[2] <= mem_data_out[2];
+                            cache_data_out[3] <= mem_data_out[3];
+                        end
+                        // load byte unsigned
+                        3'd4: begin
+                            data_array[current_block] <= {{24{1'b0}}, mem_data_out[0]};
+                            cache_data_out[0] <= mem_data_out[0];
+                            cache_data_out[1] <= {8{1'b0}};
+                            cache_data_out[2] <= {8{1'b0}};
+                            cache_data_out[3] <= {8{1'b0}};
+                        end
+                        // load halfword unsigned
+                        3'd5: begin
+                            data_array[current_block] <= {{16{1'b0}}, mem_data_out[1], mem_data_out[0]};
+                            cache_data_out[0] <= mem_data_out[0];
+                            cache_data_out[1] <= mem_data_out[1];
+                            cache_data_out[2] <= {8{1'b0}};
+                            cache_data_out[3] <= {8{1'b0}};
+                        end
+                        default: begin
+                            cache_data_out[0] <= {8{1'b0}};
+                            cache_data_out[1] <= {8{1'b0}};
+                            cache_data_out[2] <= {8{1'b0}};
+                            cache_data_out[3] <= {8{1'b0}};
+                        end
                         endcase
                         end
                     end
@@ -395,6 +399,7 @@ module Cache (
             end
 
         end
+        
         // not in cache
         else begin
             // read from memory and store in cache
