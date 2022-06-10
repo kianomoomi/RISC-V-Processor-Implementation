@@ -251,18 +251,63 @@ module Cache (
                     case(funct3)
                     // write byte to memory
                     3'd0: begin
-                        $display("dirty write");
-                        mem_data_in[0] <= data_array[current_block][7:0];
-                        mem_data_in[1] <= mem_data_out[1];
-                        mem_data_in[2] <= mem_data_out[2];
-                        mem_data_in[3] <= mem_data_out[3];
+                        case(current_byte)
+                        2'd0: begin
+                            mem_data_in[0] <= data_array[current_block][7:0];
+                            mem_data_in[1] <= mem_data_out[1];
+                            mem_data_in[2] <= mem_data_out[2];
+                            mem_data_in[3] <= mem_data_out[3];
+                        end
+                        2'd1: begin
+                            mem_data_in[0] <= data_array[current_block][15:8];
+                            mem_data_in[1] <= mem_data_out[1];
+                            mem_data_in[2] <= mem_data_out[2];
+                            mem_data_in[3] <= mem_data_out[3];
+                        end
+                        2'd2: begin
+                            mem_data_in[0] <= data_array[current_block][23:16];
+                            mem_data_in[1] <= mem_data_out[1];
+                            mem_data_in[2] <= mem_data_out[2];
+                            mem_data_in[3] <= mem_data_out[3];
+                        end
+                        2'd3: begin
+                            mem_data_in[0] <= data_array[current_block][31:24];
+                            mem_data_in[1] <= mem_data_out[1];
+                            mem_data_in[2] <= mem_data_out[2];
+                            mem_data_in[3] <= mem_data_out[3];
+                        end
+                        endcase
+
                     end
                     // write halfword to memory
                     3'd1: begin
-                        mem_data_in[0] <= data_array[current_block][7:0];
-                        mem_data_in[1] <= data_array[current_block][15:8];
-                        mem_data_in[2] <= mem_data_out[2];
-                        mem_data_in[3] <= mem_data_out[3];
+                        case(current_byte)
+                        2'd0: begin
+                            mem_data_in[0] <= data_array[current_block][7:0];
+                            mem_data_in[1] <= data_array[current_block][15:8];
+                            mem_data_in[2] <= mem_data_out[2];
+                            mem_data_in[3] <= mem_data_out[3];
+                        end
+                        2'd1: begin
+                            mem_data_in[0] <= data_array[current_block][15:8];
+                            mem_data_in[1] <= data_array[current_block][23:16];
+                            mem_data_in[2] <= mem_data_out[2];
+                            mem_data_in[3] <= mem_data_out[3];
+                        end
+                        2'd2: begin
+                            mem_data_in[0] <= data_array[current_block][23:16];
+                            mem_data_in[1] <= data_array[current_block][31:24];
+                            mem_data_in[2] <= mem_data_out[2];
+                            mem_data_in[3] <= mem_data_out[3];
+                        end
+                        2'd3: begin
+                            mem_data_in[0] <= data_array[current_block][31:24];
+                            mem_data_in[1] <= data_array[current_block][7:0];
+                            mem_data_in[2] <= mem_data_out[2];
+                            mem_data_in[3] <= mem_data_out[3];
+                        end
+                        endcase
+
                     end
                     // write word to memory
                     3'd2: begin
@@ -302,19 +347,64 @@ module Cache (
                         case(funct3)
                         // load byte
                         3'd0: begin
-                            data_array[current_block] <= {data_array[current_block][31:24], data_array[current_block][23:16], data_array[current_block][15:8], mem_data_out[0]};
-                            cache_data_out[0] <= mem_data_out[0];
-                            cache_data_out[1] <= data_array[current_block][15:8];
-                            cache_data_out[2] <= data_array[current_block][23:16];
-                            cache_data_out[3] <= data_array[current_block][31:24];
+                            case(current_byte)
+                            2'd0: begin
+                                cache_data_out[0] <= mem_data_out[0];
+                                cache_data_out[1] <= data_array[current_block][15:8];
+                                cache_data_out[2] <= data_array[current_block][23:16];
+                                cache_data_out[3] <= data_array[current_block][31:24];
+                            end
+                            2'd1: begin
+                                cache_data_out[0] <= data_array[current_block][7:0];
+                                cache_data_out[1] <= mem_data_out[0];
+                                cache_data_out[2] <= data_array[current_block][23:16];
+                                cache_data_out[3] <= data_array[current_block][31:24];
+                            end
+                            2'd2: begin
+                                cache_data_out[0] <= data_array[current_block][7:0];
+                                cache_data_out[1] <= data_array[current_block][15:8];
+                                cache_data_out[2] <= mem_data_out[0];
+                                cache_data_out[3] <= data_array[current_block][31:24];
+                            end
+                            2'd3: begin
+                                cache_data_out[0] <= data_array[current_block][7:0];
+                                cache_data_out[1] <= data_array[current_block][15:8];
+                                cache_data_out[2] <= data_array[current_block][23:16];
+                                cache_data_out[3] <= mem_data_out[0];
+                            end
+                            endcase
+                            data_array[current_block] <= {mem_data_out[3], mem_data_out[2], mem_data_out[1], mem_data_out[0]};
                         end
                         // load halfword
                         3'd1: begin
-                            data_array[current_block] <= {data_array[current_block][31:24], data_array[current_block][23:16], mem_data_out[1], mem_data_out[0]};
-                            cache_data_out[0] <= mem_data_out[0];
-                            cache_data_out[1] <= mem_data_out[1];
-                            cache_data_out[2] <= data_array[current_block][23:16];
-                            cache_data_out[3] <= data_array[current_block][31:24];
+                            case(current_byte)
+                            2'd0: begin
+                                cache_data_out[0] <= mem_data_out[0];
+                                cache_data_out[1] <= mem_data_out[1];
+                                cache_data_out[2] <= data_array[current_block][23:16];
+                                cache_data_out[3] <= data_array[current_block][31:24];
+                            end
+                            2'd1: begin
+                                cache_data_out[0] <= data_array[current_block][7:0];
+                                cache_data_out[1] <= mem_data_out[0];
+                                cache_data_out[2] <= mem_data_out[1];
+                                cache_data_out[3] <= data_array[current_block][31:24];
+                            end
+                            2'd2: begin
+                                cache_data_out[0] <= data_array[current_block][7:0];
+                                cache_data_out[1] <= data_array[current_block][15:8];
+                                cache_data_out[2] <= mem_data_out[0];
+                                cache_data_out[3] <= mem_data_out[1];
+                            end
+                            2'd3: begin
+                                cache_data_out[0] <= mem_data_out[1];
+                                cache_data_out[1] <= data_array[current_block][15:8];
+                                cache_data_out[2] <= data_array[current_block][23:16];
+                                cache_data_out[3] <= mem_data_out[0];
+                            end
+                            endcase
+                            data_array[current_block] <= {mem_data_out[3], mem_data_out[2], mem_data_out[1], mem_data_out[0]};
+
                         end
                         // load word
                         3'd2: begin
@@ -326,17 +416,47 @@ module Cache (
                         end
                         // load byte unsigned
                         3'd4: begin
-                            data_array[current_block] <= {{24{1'b0}}, mem_data_out[0]};
-                            cache_data_out[0] <= mem_data_out[0];
+                            case(current_byte)
+                            2'd0: begin
+                                cache_data_out[0] <= mem_data_out[0];
+                            end
+                            2'd1: begin
+                                cache_data_out[0] <= mem_data_out[1];
+                            end
+                            2'd2: begin
+                                cache_data_out[0] <= mem_data_out[2];
+                            end
+                            2'd3: begin
+                                cache_data_out[0] <= mem_data_out[3];
+                            end
+                            endcase
+                            data_array[current_block] <= {mem_data_out[3], mem_data_out[2], mem_data_out[1], mem_data_out[0]};
                             cache_data_out[1] <= {8{1'b0}};
                             cache_data_out[2] <= {8{1'b0}};
                             cache_data_out[3] <= {8{1'b0}};
                         end
                         // load halfword unsigned
                         3'd5: begin
-                            data_array[current_block] <= {{16{1'b0}}, mem_data_out[1], mem_data_out[0]};
-                            cache_data_out[0] <= mem_data_out[0];
-                            cache_data_out[1] <= mem_data_out[1];
+                            case(current_byte)
+                            2'd0: begin
+                                cache_data_out[0] <= mem_data_out[0];
+                                cache_data_out[1] <= mem_data_out[1];
+                            end
+                            2'd1: begin
+                                cache_data_out[0] <= mem_data_out[1];
+                                cache_data_out[1] <= mem_data_out[2];
+                            end
+                            2'd2: begin
+                                cache_data_out[0] <= mem_data_out[2];
+                                cache_data_out[1] <= mem_data_out[3];
+                            end
+                            2'd3: begin
+                                cache_data_out[0] <= mem_data_out[3];
+                                cache_data_out[1] <= mem_data_out[0];
+                            end
+
+                            endcase
+                            data_array[current_block] <= {mem_data_out[3], mem_data_out[2], mem_data_out[1], mem_data_out[0]};
                             cache_data_out[2] <= {8{1'b0}};
                             cache_data_out[3] <= {8{1'b0}};
                         end
@@ -356,19 +476,70 @@ module Cache (
                         case(funct3)
                         // write byte
                         3'd0: begin
-                            mem_data_in[0] <= cache_data_in[0];
-                            mem_data_in[1] <= mem_data_out[1];
-                            mem_data_in[2] <= mem_data_out[2];
-                            mem_data_in[3] <= mem_data_out[3];
-                            data_array[current_block] <= {data_array[current_block][31:24], data_array[current_block][23:16], data_array[current_block][15:8], cache_data_in[0]};
+                            case(current_byte)
+                            2'd0: begin
+                                mem_data_in[0] <= cache_data_in[0];
+                                mem_data_in[1] <= mem_data_out[1];
+                                mem_data_in[2] <= mem_data_out[2];
+                                mem_data_in[3] <= mem_data_out[3];
+                                data_array[current_block] <= {mem_data_out[3], mem_data_out[2], mem_data_out[1], cache_data_in[0]};
+                            end
+                            2'd1: begin
+                                mem_data_in[0] <= mem_data_out[0];
+                                mem_data_in[1] <= cache_data_in[0];
+                                mem_data_in[2] <= mem_data_out[2];
+                                mem_data_in[3] <= mem_data_out[3];
+                                data_array[current_block] <= {mem_data_out[3], mem_data_out[2], cache_data_in[0], mem_data_out[0]};
+                            end
+                            2'd2: begin
+                                mem_data_in[0] <= mem_data_out[0];
+                                mem_data_in[1] <= mem_data_out[1];
+                                mem_data_in[2] <= cache_data_in[0];
+                                mem_data_in[3] <= mem_data_out[3];
+                                data_array[current_block] <= {mem_data_out[3], cache_data_in[0], mem_data_out[1], mem_data_out[0]};
+                            end
+                            2'd3: begin
+                                mem_data_in[0] <= mem_data_out[0];
+                                mem_data_in[1] <= mem_data_out[1];
+                                mem_data_in[2] <= mem_data_out[2];
+                                mem_data_in[3] <= cache_data_in[0];
+                                data_array[current_block] <= {cache_data_in[0], mem_data_out[2], mem_data_out[1], mem_data_out[0]};
+                            end
+                            endcase
                         end
                         // write halfword
                         3'd1: begin
-                            mem_data_in[0] <= cache_data_in[0];
-                            mem_data_in[1] <= cache_data_in[1];
-                            mem_data_in[2] <= mem_data_out[2];
-                            mem_data_in[3] <= mem_data_out[3];
-                            data_array[current_block] <= {data_array[current_block][31:24], data_array[current_block][23:16], cache_data_in[1], cache_data_in[0]};
+                            case(current_byte)
+                            2'd0: begin
+                                mem_data_in[0] <= cache_data_in[0];
+                                mem_data_in[1] <= cache_data_in[1];
+                                mem_data_in[2] <= mem_data_out[2];
+                                mem_data_in[3] <= mem_data_out[3];
+                                data_array[current_block] <= {mem_data_out[3], mem_data_out[2], cache_data_in[1], cache_data_in[0]};
+                            end
+                            2'd1: begin
+                                mem_data_in[0] <= mem_data_out[0];
+                                mem_data_in[1] <= cache_data_in[0];
+                                mem_data_in[2] <= cache_data_in[1];
+                                mem_data_in[3] <= mem_data_out[3];
+                                data_array[current_block] <= {mem_data_out[3], cache_data_in[1], cache_data_in[0], mem_data_out[0]};
+                            end
+                            2'd2: begin
+                                mem_data_in[0] <= mem_data_out[0];
+                                mem_data_in[1] <= mem_data_out[1];
+                                mem_data_in[2] <= cache_data_in[0];
+                                mem_data_in[3] <= cache_data_in[1];
+                                data_array[current_block] <= {cache_data_in[1], cache_data_in[0], mem_data_out[1], mem_data_out[0]};
+                            end
+                            2'd3: begin
+                                mem_data_in[0] <= cache_data_in[1];
+                                mem_data_in[1] <= mem_data_out[1];
+                                mem_data_in[2] <= mem_data_out[2];
+                                mem_data_in[3] <= cache_data_in[0];
+                                data_array[current_block] <= {cache_data_in[0], mem_data_out[2], mem_data_out[1], cache_data_in[1]};
+                            end
+                            endcase
+
                         end
                         // write word
                         3'd2: begin
@@ -392,7 +563,6 @@ module Cache (
                             tag_array[current_block] <= current_tag;
                             v_array[current_block] <= 1;
                             dirty_array[current_block] <= 0;
-                            // cache_data_out <= mem_data_out;
                         end
                     end
                 end
@@ -415,19 +585,65 @@ module Cache (
                     case(funct3)
                     // load byte
                     3'd0: begin
-                        data_array[current_block] <= {data_array[current_block][31:24], data_array[current_block][23:16], data_array[current_block][15:8], mem_data_out[0]};
-                        cache_data_out[0] <= mem_data_out[0];
-                        cache_data_out[1] <= data_array[current_block][15:8];
-                        cache_data_out[2] <= data_array[current_block][23:16];
-                        cache_data_out[3] <= data_array[current_block][31:24];
+                        case(current_byte)
+                        2'd0: begin
+                            cache_data_out[0] <= mem_data_out[0];
+                            cache_data_out[1] <= data_array[current_block][15:8];
+                            cache_data_out[2] <= data_array[current_block][23:16];
+                            cache_data_out[3] <= data_array[current_block][31:24];
+                        end
+                        2'd1: begin
+                            cache_data_out[0] <= data_array[current_block][7:0];
+                            cache_data_out[1] <= mem_data_out[0];
+                            cache_data_out[2] <= data_array[current_block][23:16];
+                            cache_data_out[3] <= data_array[current_block][31:24];
+                        end
+                        2'd2: begin
+                            cache_data_out[0] <= data_array[current_block][7:0];
+                            cache_data_out[1] <= data_array[current_block][15:8];
+                            cache_data_out[2] <= mem_data_out[0];
+                            cache_data_out[3] <= data_array[current_block][31:24];
+                        end
+                        2'd3: begin
+                            cache_data_out[0] <= data_array[current_block][7:0];
+                            cache_data_out[1] <= data_array[current_block][15:8];
+                            cache_data_out[2] <= data_array[current_block][23:16];
+                            cache_data_out[3] <= mem_data_out[0];
+                        end
+                        endcase
+                            data_array[current_block] <= {mem_data_out[3], mem_data_out[2], mem_data_out[1], mem_data_out[0]};
+
+
                     end
                     // load halfword
                     3'd1: begin
-                        data_array[current_block] <= {data_array[current_block][31:24], data_array[current_block][23:16], mem_data_out[1], mem_data_out[0]};
-                        cache_data_out[0] <= mem_data_out[0];
-                        cache_data_out[1] <= mem_data_out[1];
-                        cache_data_out[2] <= data_array[current_block][23:16];
-                        cache_data_out[3] <= data_array[current_block][31:24];
+                        case(current_byte)
+                        2'd0: begin
+                            cache_data_out[0] <= mem_data_out[0];
+                            cache_data_out[1] <= mem_data_out[1];
+                            cache_data_out[2] <= data_array[current_block][23:16];
+                            cache_data_out[3] <= data_array[current_block][31:24];
+                        end
+                        2'd1: begin
+                            cache_data_out[0] <= data_array[current_block][7:0];
+                            cache_data_out[1] <= mem_data_out[0];
+                            cache_data_out[2] <= mem_data_out[1];
+                            cache_data_out[3] <= data_array[current_block][31:24];
+                        end
+                        2'd2: begin
+                            cache_data_out[0] <= data_array[current_block][7:0];
+                            cache_data_out[1] <= data_array[current_block][15:8];
+                            cache_data_out[2] <= mem_data_out[0];
+                            cache_data_out[3] <= mem_data_out[1];
+                        end
+                        2'd3: begin
+                            cache_data_out[0] <= mem_data_out[1];
+                            cache_data_out[1] <= data_array[current_block][15:8];
+                            cache_data_out[2] <= data_array[current_block][23:16];
+                            cache_data_out[3] <= mem_data_out[0];
+                        end
+                        endcase
+                        data_array[current_block] <= {mem_data_out[3], mem_data_out[2], mem_data_out[1], mem_data_out[0]};
                     end
                     // load word
                     3'd2: begin
@@ -439,17 +655,46 @@ module Cache (
                     end
                     // load byte unsigned
                     3'd4: begin
-                        data_array[current_block] <= {{24{1'b0}}, mem_data_out[0]};
-                        cache_data_out[0] <= mem_data_out[0];
+                        case(current_byte)
+                        2'd0: begin
+                            cache_data_out[0] <= mem_data_out[0];
+                        end
+                        2'd1: begin
+                            cache_data_out[0] <= mem_data_out[1];
+                        end
+                        2'd2: begin
+                            cache_data_out[0] <= mem_data_out[2];
+                        end
+                        2'd3: begin
+                            cache_data_out[0] <= mem_data_out[3];
+                        end
+                        endcase
+                        data_array[current_block] <= {mem_data_out[3], mem_data_out[2], mem_data_out[1], mem_data_out[0]};
                         cache_data_out[1] <= {8{1'b0}};
                         cache_data_out[2] <= {8{1'b0}};
                         cache_data_out[3] <= {8{1'b0}};
                     end
                     // load halfword unsigned
                     3'd5: begin
-                        data_array[current_block] <= {{16{1'b0}}, mem_data_out[1], mem_data_out[0]};
-                        cache_data_out[0] <= mem_data_out[0];
-                        cache_data_out[1] <= mem_data_out[1];
+                        case(current_byte)
+                        2'd0: begin
+                            cache_data_out[0] <= mem_data_out[0];
+                            cache_data_out[1] <= mem_data_out[1];
+                        end
+                        2'd1: begin
+                            cache_data_out[0] <= mem_data_out[1];
+                            cache_data_out[1] <= mem_data_out[2];
+                        end
+                        2'd2: begin
+                            cache_data_out[0] <= mem_data_out[2];
+                            cache_data_out[1] <= mem_data_out[3];
+                        end
+                        2'd3: begin
+                            cache_data_out[0] <= mem_data_out[3];
+                            cache_data_out[1] <= mem_data_out[0];
+                        end
+                        endcase
+                        data_array[current_block] <= {mem_data_out[3], mem_data_out[2], mem_data_out[1], mem_data_out[0]};
                         cache_data_out[2] <= {8{1'b0}};
                         cache_data_out[3] <= {8{1'b0}};
                     end
@@ -464,25 +709,68 @@ module Cache (
             end
             else begin
                 // write to memory and store in cache
-                // $display("write to memory");
                 mem_addr <= cache_addr;
                 mem_we <= 1;
                 case(funct3)
                         // write byte
                         3'd0: begin
-                            mem_data_in[0] <= cache_data_in[0];
-                            mem_data_in[1] <= mem_data_out[1];
-                            mem_data_in[2] <= mem_data_out[2];
-                            mem_data_in[3] <= mem_data_out[3];
-                            data_array[current_block] <= {data_array[current_block][31:24], data_array[current_block][23:16], data_array[current_block][15:8], cache_data_in[0]};
+                            case(current_byte)
+                            2'd0: begin
+                                mem_data_in[0] <= cache_data_in[0];
+                                mem_data_in[1] <= mem_data_out[1];
+                                mem_data_in[2] <= mem_data_out[2];
+                                mem_data_in[3] <= mem_data_out[3];
+                            end
+                            2'd1: begin
+                                mem_data_in[0] <= mem_data_out[0];
+                                mem_data_in[1] <= cache_data_in[0];
+                                mem_data_in[2] <= mem_data_out[2];
+                                mem_data_in[3] <= mem_data_out[3];
+                            end
+                            2'd2: begin
+                                mem_data_in[0] <= mem_data_out[0];
+                                mem_data_in[1] <= mem_data_out[1];
+                                mem_data_in[2] <= cache_data_in[0];
+                                mem_data_in[3] <= mem_data_out[3];
+                            end
+                            2'd3: begin
+                                mem_data_in[0] <= mem_data_out[0];
+                                mem_data_in[1] <= mem_data_out[1];
+                                mem_data_in[2] <= mem_data_out[2];
+                                mem_data_in[3] <= cache_data_in[0];
+                            end
+                            endcase
+                            data_array[current_block] <= {cache_data_in[3], cache_data_in[2], cache_data_in[1], cache_data_in[0]};
                         end
                         // write halfword
                         3'd1: begin
-                            mem_data_in[0] <= cache_data_in[0];
-                            mem_data_in[1] <= cache_data_in[1];
-                            mem_data_in[2] <= mem_data_out[2];
-                            mem_data_in[3] <= mem_data_out[3];
-                            data_array[current_block] <= {data_array[current_block][31:24], data_array[current_block][23:16], cache_data_in[1], cache_data_in[0]};
+                            case(current_byte)
+                            2'd0: begin
+                                mem_data_in[0] <= cache_data_in[0];
+                                mem_data_in[1] <= cache_data_in[1];
+                                mem_data_in[2] <= mem_data_out[2];
+                                mem_data_in[3] <= mem_data_out[3];
+                            end
+                            2'd1: begin
+                                mem_data_in[0] <= mem_data_out[0];
+                                mem_data_in[1] <= cache_data_in[0];
+                                mem_data_in[2] <= cache_data_in[1];
+                                mem_data_in[3] <= mem_data_out[3];
+                            end
+                            2'd2: begin
+                                mem_data_in[0] <= mem_data_out[0];
+                                mem_data_in[1] <= mem_data_out[1];
+                                mem_data_in[2] <= cache_data_in[0];
+                                mem_data_in[3] <= cache_data_in[1];
+                            end
+                            2'd3: begin
+                                mem_data_in[0] <= cache_data_in[1];
+                                mem_data_in[1] <= mem_data_out[1];
+                                mem_data_in[2] <= mem_data_out[2];
+                                mem_data_in[3] <= cache_data_out[0];
+                            end
+                            endcase
+                            data_array[current_block] <= {cache_data_in[3], cache_data_in[2], cache_data_in[1], cache_data_in[0]};
                         end
                         // write word
                         3'd2: begin
@@ -502,13 +790,11 @@ module Cache (
                 endcase
                 interupt_start <= 1;
                 if (interupt_stop == 1) begin
-                    // $display("interupt_stop == 1");
                     interupt_start <= 0;
                     interupt_second <= 0;
                     tag_array[current_block] <= current_tag;
                     v_array[current_block] <= 1;
                     dirty_array[current_block] <= 0;
-                    // cache_data_out <= mem_data_out;
                     bool <= 1;
                 end
             end
@@ -517,6 +803,5 @@ module Cache (
         else bool <= 0;
         end
     end
-
 
 endmodule

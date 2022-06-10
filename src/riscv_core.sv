@@ -94,20 +94,6 @@ module riscv_core(
         .funct3(funct3)
     );
     
-    // ALU alu_module(
-    //     input1,
-    //     input2,
-    //     alu_control,
-    //     rd_data,
-    //     funct3,
-    //     mem_addr,
-    //     mem_write_en,
-    //     mem_data_out,
-    //     mem_data_in,
-    //     inpin,
-    //     inst_addr
-    // );
-
     ALU alu_module(
         input1,
         input2,
@@ -126,29 +112,18 @@ module riscv_core(
     reg [31:0] forward = 4;
     reg [2:0] counter = 0;
     always_ff @(posedge clk) begin
-        // $display("\n");
-        // $display("%h", inst_addr);
-        // $display("%h", inst);
-       
          if (opcode == 'h73) begin
             halted <= 1;
         end
-        //  if (opcode == 'h03) begin
-        //     halted <= 1;
-        // end
-
-        if (interupt_start == 1) begin
-            // $display("interupt_start");
+          if (interupt_start == 1) begin
             counter <= counter + 1;
             interupt_stop <= 0;
             if (counter == 4) begin
-                // $display("interupt_stoppppp");
                 interupt_stop <= 1;
                 counter <= 0;
             end
         end
         else if (interupt_second == 1) begin
-            // $display("interupt_second");
             counter <= counter + 1;
             interupt_stop <= 0;
             if (counter == 4) begin
@@ -157,11 +132,8 @@ module riscv_core(
             end
         end
         else begin
-        if (bool != 1'b0) begin
-            // $display("hi");
-            // $display("%h", opcode);  
+        if (bool != 1'b0) begin 
             if ((opcode == 7'h23 || opcode == 7'h03) && bool2==1'b0) begin
-                // $display("hi3");
                 inst_addr <= inst_addr;
                 bool2 <= 1'b1;
             end
@@ -212,7 +184,6 @@ module riscv_core(
             input1 = rs1_data;
             input2 = immSmall;
             inpin = rs2_data;
-            // $display("%h", inpin);
             rd_num = 0;
         end
 
@@ -266,12 +237,7 @@ module riscv_core(
         
         'h6F: begin
             forward = immSmall;
-        end
-        
-        // 'h73: begin
-        //     halted = 1;
-        // end
-        
+        end       
         default: begin
             input1 = 0;
             input2 = 0;

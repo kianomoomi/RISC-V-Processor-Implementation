@@ -22,7 +22,7 @@ module memory(
     parameter default_file="";
 
     reg [7:0] mem[start:top];
-    wire [31:0] ea = addr; //& 32'hfffffffc;
+    wire [31:0] ea = addr & 32'hfffffffc;
 
     assign data_out[0] = mem[ea];
     assign data_out[1] = mem[ea + 1];
@@ -30,10 +30,6 @@ module memory(
     assign data_out[3] = mem[ea + 3];
 
     always_ff @(posedge clk, negedge rst_b) begin
-        $display("-------------");
-        // $display("%h",{mem['d11], mem['d10],mem['d9],mem['d8]});
-        $display("%h",{mem['d15], mem['d14],mem['d13],mem['d12]});
-        $display("-------------");
         if (rst_b == 0) begin
             integer i;
             if (has_default) begin
