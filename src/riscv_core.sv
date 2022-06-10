@@ -90,7 +90,8 @@ module riscv_core(
         .interupt_start(interupt_start),
         .interupt_second(interupt_second),
         .interupt_stop(interupt_stop),
-        .opcode(opcode)
+        .opcode(opcode),
+        .funct3(funct3)
     );
     
     // ALU alu_module(
@@ -125,9 +126,9 @@ module riscv_core(
     reg [31:0] forward = 4;
     reg [2:0] counter = 0;
     always_ff @(posedge clk) begin
-         $display("\n");
-        $display("%h", inst_addr);
-        $display("%h", inst);
+        // $display("\n");
+        // $display("%h", inst_addr);
+        // $display("%h", inst);
        
         //  if (opcode == 'h73) begin
         //     halted <= 1;
@@ -137,17 +138,17 @@ module riscv_core(
         end
 
         if (interupt_start == 1) begin
-            $display("interupt_start");
+            // $display("interupt_start");
             counter <= counter + 1;
             interupt_stop <= 0;
             if (counter == 4) begin
-                $display("interupt_stoppppp");
+                // $display("interupt_stoppppp");
                 interupt_stop <= 1;
                 counter <= 0;
             end
         end
         else if (interupt_second == 1) begin
-            $display("interupt_second");
+            // $display("interupt_second");
             counter <= counter + 1;
             interupt_stop <= 0;
             if (counter == 4) begin
@@ -157,10 +158,10 @@ module riscv_core(
         end
         else begin
         if (bool != 1'b0) begin
-            $display("hi");
-            $display("%h", opcode);  
+            // $display("hi");
+            // $display("%h", opcode);  
             if ((opcode == 7'h23 || opcode == 7'h03) && bool2==1'b0) begin
-                $display("hi3");
+                // $display("hi3");
                 inst_addr <= inst_addr;
                 bool2 <= 1'b1;
             end
@@ -211,7 +212,7 @@ module riscv_core(
             input1 = rs1_data;
             input2 = immSmall;
             inpin = rs2_data;
-            $display("%h", inpin);
+            // $display("%h", inpin);
             rd_num = 0;
         end
 
