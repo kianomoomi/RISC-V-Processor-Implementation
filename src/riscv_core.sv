@@ -117,7 +117,7 @@ module riscv_core(
         cache_data_out,
         cache_data_in,
         inpin_buffer,
-        instAddr_buffer,
+        instAddr_buffer4,
         clk,
         rst_b
     );
@@ -140,6 +140,9 @@ module riscv_core(
     );
 
     reg [31:0] instAddr_buffer;
+    reg [31:0] instAddr_buffer2;
+    reg [31:0] instAddr_buffer3;
+    reg [31:0] instAddr_buffer4;
 
     dff #(32) IA_dff(
         .d(inst_addr),
@@ -148,6 +151,26 @@ module riscv_core(
         .rst_b(rst_b)
     );
 
+    dff #(32) IA_dff2(
+        .d(instAddr_buffer),
+        .q(instAddr_buffer2),
+        .clk(clk),
+        .rst_b(rst_b)
+    );
+
+    dff #(32) IA_dff3(
+        .d(instAddr_buffer2),
+        .q(instAddr_buffer3),
+        .clk(clk),
+        .rst_b(rst_b)
+    );
+
+    dff #(32) IA_dff4(
+        .d(instAddr_buffer3),
+        .q(instAddr_buffer4),
+        .clk(clk),
+        .rst_b(rst_b)
+    );
 
     reg halted1;
     reg halted2;
@@ -406,6 +429,10 @@ module riscv_core(
         end
         
         'h17: begin
+            immSmall = {inst_buffer2[31:12], {12{1'b0}}};
+            rd_num = inst_buffer2[11:7];
+            alu_control <= 4'b1110;
+
             input1 = immSmall;
         end
         
@@ -503,7 +530,8 @@ module riscv_core(
         end
         
         'h17: begin
-            input1 = immSmall;
+            rs1_num = {5{1'b0}};
+            rs2_num = {5{1'b0}};
         end
         
         // load
