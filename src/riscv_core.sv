@@ -64,29 +64,7 @@ module riscv_core(
         .rst_b(rst_b),
         .halted(halted)
     );
-
-    // Control_Unit control_module(
-    //     inst,
-    //     inst_addr,
-    //     rs1_num,
-    //     rs2_num,
-    //     rd_num,
-    //     immSmall,
-    //     alu_control
-    // );
-
-    // Control_Unit control_module(
-    //     inst_buffer,
-    //     // inst_addr,
-    //     rs1_num,
-    //     rs2_num,
-    //     rd_num,
-    //     immSmall,
-    //     alu_control,
-    //     clk,
-    //     rst_b
-    // );
-
+    
     Cache cache (
         .cache_addr(cache_addr),
         .cache_hit(cache_hit),
@@ -102,9 +80,27 @@ module riscv_core(
         .interupt_start(interupt_start),
         .interupt_second(interupt_second),
         .interupt_stop(interupt_stop),
-        .opcode(opcode),
-        .funct3(funct3)
+        .opcode(opcode4),
+        .funct3(funct3_buffer4)
     );
+
+    reg [6:0] opcode1;
+    reg [6:0] opcode2;
+    reg [6:0] opcode3;
+    reg [6:0] opcode4;
+
+    reg [2:0] funct3_buffer2;
+    reg [2:0] funct3_buffer3;
+    reg [2:0] funct3_buffer4;
+
+    dff #(7) opcode_dff1(opcode, opcode1, clk, rst_b);
+    dff #(7) opcode_dff2(opcode1, opcode2, clk, rst_b);
+    dff #(7) opcode_dff3(opcode2, opcode3, clk, rst_b);
+    dff #(7) opcode_dff4(opcode3, opcode4, clk, rst_b);
+
+    dff #(3) funct3_dff1(funct3_buffer, funct3_buffer2, clk, rst_b);
+    dff #(3) funct3_dff2(funct3_buffer2, funct3_buffer3, clk, rst_b);
+    dff #(3) funct3_dff3(funct3_buffer3, funct3_buffer4, clk, rst_b);
     
     ALU alu_module(
         input1_buffer,
@@ -117,7 +113,7 @@ module riscv_core(
         cache_data_out,
         cache_data_in,
         inpin_buffer,
-        instAddr_buffer4,
+        instAddr_buffer5,
         clk,
         rst_b
     );
@@ -143,6 +139,7 @@ module riscv_core(
     reg [31:0] instAddr_buffer2;
     reg [31:0] instAddr_buffer3;
     reg [31:0] instAddr_buffer4;
+    reg [31:0] instAddr_buffer5;
 
     dff #(32) IA_dff(
         .d(inst_addr),
@@ -168,6 +165,13 @@ module riscv_core(
     dff #(32) IA_dff4(
         .d(instAddr_buffer3),
         .q(instAddr_buffer4),
+        .clk(clk),
+        .rst_b(rst_b)
+    );
+
+    dff #(32) IA_dff5(
+        .d(instAddr_buffer4),
+        .q(instAddr_buffer5),
         .clk(clk),
         .rst_b(rst_b)
     );
@@ -232,11 +236,80 @@ module riscv_core(
 
     reg [31:0] forward = 4;
     reg [2:0] counter = 0;
+
+    reg boolSW1 = 1'b0;
+    reg boolSW2 = 1'b0;
+    reg boolSW3 = 1'b0;
+    reg boolSW4 = 1'b0;
+    reg boolSW5 = 1'b0;
+    reg boolSW6 = 1'b0;
+
     always_ff @(posedge clk) begin
-         if (opcode == 'h73) begin
+
+        // boolSW here is for Store instruction
+        if (inst[6:0] == 7'h23 && boolSW1 == 1'b0 && boolSW2 == 1'b0 && boolSW3 == 1'b0 && boolSW4 == 1'b0 && boolSW5 == 1'b0 && boolSW6 == 1'b0 ) begin
+            forward = 0;
+            boolSW1 = 1'b1;
+        end
+        else if (inst[6:0] == 7'h23 && boolSW1 == 1'b1 && boolSW2 == 1'b0 && boolSW3 == 1'b0 && boolSW4 == 1'b0 && boolSW5 == 1'b0 && boolSW6 == 1'b0 ) begin
+            boolSW2 = 1'b1;
+            forward = 0;
+        end
+        else if (inst[6:0] == 7'h23 && boolSW1 == 1'b1 && boolSW2 == 1'b1 && boolSW3 == 1'b0 && boolSW4 == 1'b0 && boolSW5 == 1'b0 && boolSW6 == 1'b0 ) begin
+            boolSW3 = 1'b1;
+            forward = 0;
+        end
+        else if (inst[6:0] == 7'h23 && boolSW1 == 1'b1 && boolSW2 == 1'b1 && boolSW3 == 1'b1 && boolSW4 == 1'b0 && boolSW5 == 1'b0 && boolSW6 == 1'b0 ) begin
+            boolSW4 = 1'b1;
+            forward = 0;
+        end
+        else if (inst[6:0] == 7'h23 && boolSW1 == 1'b1 && boolSW2 == 1'b1 && boolSW3 == 1'b1 && boolSW4 == 1'b1 && boolSW5 == 1'b0 && boolSW6 == 1'b0 ) begin
+            boolSW5 = 1'b1;
+            forward = 0;
+        end
+        else if (inst[6:0] == 7'h23 && boolSW1 == 1'b1 && boolSW2 == 1'b1 && boolSW3 == 1'b1 && boolSW4 == 1'b1 && boolSW5 == 1'b1 && boolSW6 == 1'b0 ) begin
+            boolSW6 = 1'b1;
+            forward = 0;
+        end
+        else if (inst[6:0] == 7'h23 && boolSW1 == 1'b1 && boolSW2 == 1'b1 && boolSW3 == 1'b1 && boolSW4 == 1'b1 && boolSW5 == 1'b1 && boolSW6 == 1'b1 ) begin
+            boolSW1 = 1'b0;
+            boolSW2 = 1'b0;
+            boolSW3 = 1'b0;
+            boolSW4 = 1'b0;
+            boolSW5 = 1'b0;
+            boolSW6 = 1'b0;
+            forward = 4;
+        end
+
+        // boolSW here is for Load instruction
+        if (inst[6:0] == 7'h03 && boolSW1 == 1'b0 && boolSW2 == 1'b0 && boolSW3 == 1'b0 && boolSW4 == 1'b0 ) begin
+            forward = 0;
+            boolSW1 = 1'b1;
+        end
+        else if (inst[6:0] == 7'h03 && boolSW1 == 1'b1 && boolSW2 == 1'b0 && boolSW3 == 1'b0 && boolSW4 == 1'b0 ) begin
+            boolSW2 = 1'b1;
+            forward = 0;
+        end
+        else if (inst[6:0] == 7'h03 && boolSW1 == 1'b1 && boolSW2 == 1'b1 && boolSW3 == 1'b0 && boolSW4 == 1'b0 ) begin
+            boolSW3 = 1'b1;
+            forward = 0;
+        end
+        else if (inst[6:0] == 7'h03 && boolSW1 == 1'b1 && boolSW2 == 1'b1 && boolSW3 == 1'b1 && boolSW4 == 1'b0 ) begin
+            boolSW4 = 1'b1;
+            forward = 0;
+        end
+        else if (inst[6:0] == 7'h03 && boolSW1 == 1'b1 && boolSW2 == 1'b1 && boolSW3 == 1'b1 && boolSW4 == 1'b1 ) begin
+            boolSW1 = 1'b0;
+            boolSW2 = 1'b0;
+            boolSW3 = 1'b0;
+            boolSW4 = 1'b0;
+            forward = 4;
+        end
+        
+        if (opcode == 'h73) begin
             halted1 <= 1;
         end
-          if (interupt_start == 1) begin
+        if (interupt_start == 1) begin
             counter <= counter + 1;
             interupt_stop <= 0;
             if (counter == 4) begin
@@ -255,11 +328,11 @@ module riscv_core(
         else begin
         // if (bool != 1'b0) begin 
             if ((opcode == 7'h23 || opcode == 7'h03) && bool2==1'b0) begin
-                inst_addr <= inst_addr;
+                inst_addr = inst_addr;
                 bool2 <= 1'b1;
             end
             else begin
-                inst_addr <= inst_addr + forward;
+                inst_addr = inst_addr + forward;
                 bool2 <= 1'b0;
             end
         // end
@@ -310,51 +383,42 @@ module riscv_core(
     );
 
     always_ff @(posedge clk) begin
-        // $display("%h", inst);
-        // $display("%h", inst_buffer);
         opcode = inst_buffer2[6:0];
-        funct3 = inst_buffer2[14:12];
-        forward <= 4;
+        funct3 <= inst_buffer2[14:12];
+        forward = 4;
         case(opcode)
 
         'h33: begin
             // rs1_num = inst_buffer[19:15];
             // rs2_num = inst_buffer[24:20];
             rd_num = inst_buffer2[11:7];
-            funct3 = inst_buffer2[14:12];
+            funct3 <= inst_buffer2[14:12];
             funct7 = inst_buffer2[31:25];
                    
             input1 = rs1_data;
             input2 = rs2_data;
-            $display("rs1num: %h", rs1_num);
-            $display("rs1: %d", rs1_data);
-            $display("input1: %h", input1);
-            $display("rs2num: %h", rs2_num);
-            $display("rs2: %d", rs2_data);
-            $display("input2: %h", input2);
-
             // add
-            if (funct3 == 0 && funct7 == 0) begin
+            if (inst_buffer2[14:12] == 0 && funct7 == 0) begin
                 alu_control <= 4'b0010;
             end
             // sub
-            if (funct3 == 0 && funct7 == 32) begin
+            if (inst_buffer2[14:12] == 0 && funct7 == 32) begin
                 alu_control <= 4'b0100;
             end
             // sll
-            if (funct3 == 1 && funct7 == 0) begin
+            if (inst_buffer2[14:12] == 1 && funct7 == 0) begin
                 alu_control <= 4'b0001;
             end
             // slt
-            if (funct3 == 2 && funct7 == 0) begin
+            if (inst_buffer2[14:12] == 2 && funct7 == 0) begin
                 alu_control <= 4'b0101;
             end
             // sltu
-            if (funct3 == 3 && funct7 == 0) begin
+            if (inst_buffer2[14:12] == 3 && funct7 == 0) begin
                 alu_control <= 4'b0111;
             end
             // xor
-            if (funct3 == 4 && funct7 == 0) begin
+            if (inst_buffer2[14:12] == 4 && funct7 == 0) begin
                 alu_control <= 4'b0110;
             end
         end
@@ -363,58 +427,55 @@ module riscv_core(
             // rs1_num = inst_buffer[19:15];
             // rs2_num = {5{1'b0}};
             rd_num = inst_buffer2[11:7];
-            funct3 = inst_buffer2[14:12];
+            funct3 <= inst_buffer2[14:12];
             immSmall = {{20{inst_buffer2[31]}}, inst_buffer2[31:20]};
             input1 = rs1_data;
             input2 = immSmall;
-            
-            // $display("rs1num: %h", rs1_num);
-            // $display("rs1: %d", rs1_data);
-            // $display("input1: %h", input1);
-            // $display("immidiate: %d", immSmall);
-            // $display("input2: %h", input2);
 
             // addi
-            if (funct3 == 0) begin
+            if (inst_buffer2[14:12] == 0) begin
                 alu_control <= 4'b0010;
             end
             // slli
-            if (funct3 == 1) begin
+            if (inst_buffer2[14:12] == 1) begin
                 alu_control <= 4'b0001;
                 immSmall = {{27{1'b0}}, immSmall[4:0]};
+                input2 = immSmall;
             end
             // slti
-            if (funct3 == 2) begin
+            if (inst_buffer2[14:12] == 2) begin
                 alu_control <= 4'b0101;
             end
             // sltiu
-            if (funct3 == 3) begin
+            if (inst_buffer2[14:12] == 3) begin
                 alu_control <= 4'b0111;
             end
             //xori
-            if (funct3 == 4) begin
+            if (inst_buffer2[14:12] == 4) begin
                 alu_control <= 4'b0110;
             end
             //srli
-            if (funct3 == 5) begin
+            if (inst_buffer2[14:12] == 5) begin
                 if (immSmall[10] == 0) begin
                     alu_control <= 4'b1000;
                     immSmall = {{27{1'b0}}, immSmall[4:0]};
+                    input2 = immSmall;
                 end
             end
             //srai
-            if (funct3 == 5) begin
+            if (inst_buffer2[14:12] == 5) begin
                 if (immSmall[10] == 1) begin
                     alu_control <= 4'b1001;
-                    immSmall =  {{27{1'b0}}, immSmall[4:0]};
+                    immSmall = {{27{1'b0}}, immSmall[4:0]};
+                    input2 = immSmall;
                 end
             end
             //ori
-            if (funct3 == 6) begin
+            if (inst_buffer2[14:12] == 6) begin
                 alu_control <= 4'b0011;
             end
             //andi
-            if (funct3 == 7) begin
+            if (inst_buffer2[14:12] == 7) begin
                 alu_control <= 4'b0000;
             end
         end
@@ -438,56 +499,69 @@ module riscv_core(
         
         // load
         'h03: begin
+            rd_num = inst_buffer2[11:7];
+            funct3 <= inst_buffer2[14:12];
+            immSmall = {{20{inst_buffer2[31]}}, inst_buffer2[31:20]};
+            alu_control <= 4'b1101;
+
             input1 = rs1_data;
             input2 = immSmall;
         end
         
         // store
         'h23: begin
+            funct3 <= inst_buffer2[14:12];
+            immSmall = {{20{inst_buffer2[31]}}, inst_buffer2[31:25], inst_buffer2[11:7]};
+            alu_control <= 4'b1100;
+
             input1 = rs1_data;
             input2 = immSmall;
             inpin = rs2_data;
-            // rd_num <= 0;
+            rd_num = 0;
         end
 
         'h63: begin
-            // rd_num <= 0;
+            funct3 <= inst_buffer2[14:12];
+            immSmall = {{19{inst_buffer2[31]}}, inst_buffer2[31], inst_buffer2[7], inst_buffer2[30:25], inst_buffer2[11:8], {1{1'b0}}};
+            // we assign 1111 to alu_control because registers should'nt change
+            alu_control <= 4'b1111;
+            rd_num = 0;
             case(funct3)
                 0: begin
                     if (rs1_data == rs2_data)
-                        forward <= immSmall;
+                        forward = immSmall;
                     else
-                        forward <= 4;
+                        forward = 4;
                 end
                 1: begin
                     if (rs1_data != rs2_data)
-                        forward <= immSmall;
+                        forward = immSmall;
                     else
-                        forward <= 4;
+                        forward = 4;
                 end
                 4: begin
                     if ($signed(rs1_data) < $signed(rs2_data))
-                        forward <= immSmall;
+                        forward = immSmall;
                     else
-                        forward <= 4;
+                        forward = 4;
                 end
                 5: begin
                     if ($signed(rs1_data) >= $signed(rs2_data))
-                        forward <= immSmall;
+                        forward = immSmall;
                     else
-                        forward <= 4;
+                        forward = 4;
                 end
                 6: begin
                     if ($unsigned(rs1_data) < $unsigned(rs2_data))
-                        forward <= immSmall;
+                        forward = immSmall;
                     else
-                        forward <= 4;
+                        forward = 4;
                 end
                 7: begin
                     if ($unsigned(rs1_data) >= $unsigned(rs2_data))
-                        forward <= immSmall;
+                        forward = immSmall;
                     else
-                        forward <= 4;
+                        forward = 4;
                 end
             endcase
         end
@@ -495,11 +569,11 @@ module riscv_core(
         'h67: begin
             input1 = rs1_data;
             input2 = immSmall;
-            forward <= ((rs1_data+immSmall) & (-2)) - inst_addr;
+            forward = ((rs1_data+immSmall) & (-2)) - inst_addr;
         end
         
         'h6F: begin
-            forward <= immSmall;
+            forward = immSmall;
         end       
         default: begin
             input1 = 0;
@@ -510,8 +584,8 @@ module riscv_core(
 
     always_ff @(posedge clk) begin
         opcode = inst_buffer[6:0];
-        funct3 = inst_buffer[14:12];
-        forward <= 4;
+        funct3 <= inst_buffer[14:12];
+        forward = 4;
         case(opcode)
 
         'h33: begin
@@ -536,68 +610,31 @@ module riscv_core(
         
         // load
         'h03: begin
-            input1 = rs1_data;
-            input2 = immSmall;
+            rs1_num = inst_buffer[19:15];
+            rs2_num = {5{1'b0}};
         end
         
         // store
         'h23: begin
-            input1 = rs1_data;
-            input2 = immSmall;
-            inpin = rs2_data;
+            rs1_num = inst_buffer[19:15];
+            rs2_num = inst_buffer[24:20];
+
             // rd_num <= 0;
         end
 
         'h63: begin
-            // rd_num <= 0;
-            case(funct3)
-                0: begin
-                    if (rs1_data == rs2_data)
-                        forward <= immSmall;
-                    else
-                        forward <= 4;
-                end
-                1: begin
-                    if (rs1_data != rs2_data)
-                        forward <= immSmall;
-                    else
-                        forward <= 4;
-                end
-                4: begin
-                    if ($signed(rs1_data) < $signed(rs2_data))
-                        forward <= immSmall;
-                    else
-                        forward <= 4;
-                end
-                5: begin
-                    if ($signed(rs1_data) >= $signed(rs2_data))
-                        forward <= immSmall;
-                    else
-                        forward <= 4;
-                end
-                6: begin
-                    if ($unsigned(rs1_data) < $unsigned(rs2_data))
-                        forward <= immSmall;
-                    else
-                        forward <= 4;
-                end
-                7: begin
-                    if ($unsigned(rs1_data) >= $unsigned(rs2_data))
-                        forward <= immSmall;
-                    else
-                        forward <= 4;
-                end
-            endcase
+            rs1_num = inst_buffer[19:15];
+            rs2_num = inst_buffer[24:20];
         end
         
         'h67: begin
             input1 = rs1_data;
             input2 = immSmall;
-            forward <= ((rs1_data+immSmall) & (-2)) - inst_addr;
+            forward = ((rs1_data+immSmall) & (-2)) - inst_addr;
         end
         
         'h6F: begin
-            forward <= immSmall;
+            forward = immSmall;
         end       
         default: begin
             input1 = 0;

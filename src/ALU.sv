@@ -25,10 +25,10 @@ module ALU (
     input [3:0] alu_control,
     output reg [31:0] alu_result_buffer,
     input [2:0] funct3,
-    output reg [31:0] mem_addr_buffer,
-    output reg mem_write_en_buffer,
+    output reg [31:0] mem_addr,
+    output reg mem_write_en,
     input [7:0] mem_data_out [0:3],
-    output [7:0] mem_data_in_buffer [0:3],
+    output [7:0] mem_data_in [0:3],
     input [31:0] inpin,
     input [31:0] inst_addr_inp,
     input clk,
@@ -36,34 +36,10 @@ module ALU (
 );
 
 reg [31:0] alu_result;
-reg [31:0] mem_addr;
-reg mem_write_en;
-reg [7:0] mem_data_in [0:3];
 
 dff #(32) aluRes_dff (
     .d(alu_result),
     .q(alu_result_buffer),
-    .clk(clk),
-    .rst_b(rst_b)
-);
-
-dff #(32) memAddr_dff (
-    .d(mem_addr),
-    .q(mem_addr_buffer),
-    .clk(clk),
-    .rst_b(rst_b)
-);
-
-dff #(1) memWriteEn_dff (
-    .d(mem_write_en),
-    .q(mem_write_en_buffer),
-    .clk(clk),
-    .rst_b(rst_b)
-);
-
-dff #(8) memDataIn_dff[0:3] (
-    .d(mem_data_in),
-    .q(mem_data_in_buffer),
     .clk(clk),
     .rst_b(rst_b)
 );

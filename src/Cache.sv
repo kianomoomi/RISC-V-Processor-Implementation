@@ -54,7 +54,7 @@ module Cache (
     assign current_tag = cache_addr[31:13];
 
     always_ff @(posedge clk, negedge rst_b) begin 
-        if(rst_b == 0) begin
+            if(rst_b == 0) begin
             integer i;
             for(i = 0; i <= ARRAY_SIZE; i = i + 1) begin
                 v_array[i] <= 0;
