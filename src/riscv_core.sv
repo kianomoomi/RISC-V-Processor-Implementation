@@ -64,7 +64,7 @@ module riscv_core(
         .rst_b(rst_b),
         .halted(halted)
     );
-    
+
     Cache cache (
         .cache_addr(cache_addr),
         .cache_hit(cache_hit),
@@ -244,6 +244,9 @@ module riscv_core(
     reg boolSW5 = 1'b0;
     reg boolSW6 = 1'b0;
 
+    reg boolCopy = 1'b0;
+    reg [31:0] inst_copy = 0; 
+
     always_ff @(posedge clk) begin
 
         // boolSW here is for Store instruction
@@ -305,9 +308,28 @@ module riscv_core(
             boolSW4 = 1'b0;
             forward = 4;
         end
-        
+
         if (opcode == 'h73) begin
             halted1 <= 1;
+        end
+
+        if (boolCopy == 1'b0) begin
+            inst_copy = inst;
+            boolCopy = 1'b1;
+        end
+
+        if (inst_copy[6:0] == 'h33 || inst_copy[6:0] == 'h13) begin
+            inst_addr += 'd256;
+            $display("addr: %h", inst_addr);
+            $display("inst: %h", inst);
+            forward = 0;
+            counter <= counter + 1;
+            if (counter == 4) begin
+                counter <= 0;
+                inst_addr -= 'd1024;
+                forward = 4;
+                boolCopy = 1'b0;
+            end
         end
         if (interupt_start == 1) begin
             counter <= counter + 1;
